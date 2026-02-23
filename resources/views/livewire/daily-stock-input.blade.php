@@ -1,17 +1,20 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Input Stok Harian') }}
-            </h2>
-            <span class="inline-flex items-center gap-1.5 text-sm text-gray-500">
-                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                {{ Auth::user()->warehouse->name ?? 'Warehouse' }}
-            </span>
+<div>
+    {{-- Page Heading --}}
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ __('Input Stok Harian') }}
+                </h2>
+                <span class="inline-flex items-center gap-1.5 text-sm text-gray-500">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    {{ Auth::user()->warehouse->name ?? 'Warehouse' }}
+                </span>
+            </div>
         </div>
-    </x-slot>
+    </header>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -201,4 +204,4 @@
 
         </div>
     </div>
-</x-app-layout>
+</div>

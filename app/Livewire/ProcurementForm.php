@@ -114,6 +114,7 @@ class ProcurementForm extends Component
 
     public function render()
     {
-        return view('livewire.procurement-form');
+        return view('livewire.procurement-form')
+            ->layout('layouts.app');
     }
 }

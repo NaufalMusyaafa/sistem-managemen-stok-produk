@@ -168,6 +168,6 @@ class DailyStockInput extends Component
     {
         return view('livewire.daily-stock-input', [
             'filteredItems' => $this->filteredItems,
-        ]);
+        ])->layout('layouts.app');
     }
 }
