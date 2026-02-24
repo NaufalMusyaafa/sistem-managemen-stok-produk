@@ -141,14 +141,19 @@
                                     $wLow = $items->where('status', 'low_stock')->count();
                                     $wOrder = $items->where('status', 'on_order')->count();
                                 @endphp
-                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                <tr class="hover:bg-indigo-50/50 transition-colors cursor-pointer group" onclick="window.location='{{ route('warehouse.detail', $warehouse->id) }}'">
                                     <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <div class="w-9 h-9 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <span class="text-xs font-bold text-indigo-600">{{ $index + 1 }}</span>
                                             </div>
-                                            <span class="text-sm font-semibold text-gray-900">{{ $warehouse->name }}</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ $warehouse->name }}</span>
+                                                <svg class="w-4 h-4 text-gray-300 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-500">{{ $warehouse->location }}</td>

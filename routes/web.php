@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Livewire\DailyStockInput;
 use App\Livewire\ProcurementForm;
+use App\Livewire\WarehouseStockDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/procurement/{id}', ProcurementForm::class)
         ->middleware('role:manager')
         ->name('procurement.create');
+
+    // ──────────────────────────────────────────────
+    // Admin UID & Manager — Warehouse Stock Detail
+    // ──────────────────────────────────────────────
+    Route::get('/warehouse/{id}', WarehouseStockDetail::class)
+        ->middleware('role:admin_uid,manager')
+        ->name('warehouse.detail');
 });
 
 require __DIR__.'/auth.php';
