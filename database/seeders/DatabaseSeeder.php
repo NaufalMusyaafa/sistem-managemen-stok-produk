@@ -151,7 +151,15 @@ class DatabaseSeeder extends Seeder
             'warehouse_id' => null,
         ]);
 
-        $this->command->info('✔ 3 Users created (password: "password").');
+        User::create([
+            'name'         => 'Manager Notifikasi',
+            'email'        => 'xoening07@gmail.com',
+            'password'     => $defaultPassword,
+            'role'         => 'manager',
+            'warehouse_id' => null,
+        ]);
+
+        $this->command->info('✔ 4 Users created (password: "password").');
 
         // ──────────────────────────────────────────────
         // 4. PIVOT SEEDING — warehouse_products (500)
