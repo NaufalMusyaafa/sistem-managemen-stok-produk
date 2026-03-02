@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Livewire\DailyStockInput;
+use App\Livewire\ManageProducts;
+use App\Livewire\ManageUsers;
+use App\Livewire\ManageWarehouseProducts;
+use App\Livewire\ManageWarehouses;
 use App\Livewire\ProcurementForm;
 use App\Livewire\WarehouseStockDetail;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +48,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse/{id}', WarehouseStockDetail::class)
         ->middleware('role:admin_uid,manager')
         ->name('warehouse.detail');
+
+    // ──────────────────────────────────────────────
+    // Admin UID & Admin UP3 — Warehouse Product Management
+    // ──────────────────────────────────────────────
+    Route::get('/manage/warehouse-products', ManageWarehouseProducts::class)
+        ->middleware('role:admin_uid,admin_up3')
+        ->name('manage.warehouse-products');
+
+    // ──────────────────────────────────────────────
+    // Admin UID — CMS Management Pages
+    // ──────────────────────────────────────────────
+    Route::middleware('role:admin_uid')->group(function () {
+        Route::get('/manage/products', ManageProducts::class)->name('manage.products');
+        Route::get('/manage/warehouses', ManageWarehouses::class)->name('manage.warehouses');
+        Route::get('/manage/users', ManageUsers::class)->name('manage.users');
+    });
 });
 
 require __DIR__.'/auth.php';

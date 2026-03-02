@@ -17,15 +17,33 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex items-center">
                     @if (Auth::user()->role === 'admin_up3')
                         <x-nav-link :href="route('daily-stock')" :active="request()->routeIs('daily-stock')">
                             {{ __('Input Stok Harian') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('manage.warehouse-products')" :active="request()->routeIs('manage.warehouse-products')">
+                            {{ __('Kelola Stok') }}
                         </x-nav-link>
                     @else
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+                    @endif
+
+                    @if (Auth::user()->role === 'admin_uid')
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" @click.outside="open = false" class="inline-flex items-center gap-1 px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none {{ request()->routeIs('manage.*') ? 'text-gray-900 border-b-2 border-indigo-400' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300' }}" style="padding-bottom: 18px;">
+                                Kelola
+                                <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 z-50 mt-0 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black/5 py-1" style="display: none;">
+                                <a href="{{ route('manage.products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.products') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Produk</a>
+                                <a href="{{ route('manage.warehouses') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouses') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Gudang</a>
+                                <a href="{{ route('manage.warehouse-products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouse-products') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Stok Gudang</a>
+                                <a href="{{ route('manage.users') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.users') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">User</a>
+                            </div>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -92,10 +110,23 @@
                 <x-responsive-nav-link :href="route('daily-stock')" :active="request()->routeIs('daily-stock')">
                     {{ __('Input Stok Harian') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('manage.warehouse-products')" :active="request()->routeIs('manage.warehouse-products')">
+                    {{ __('Kelola Stok') }}
+                </x-responsive-nav-link>
             @else
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}
                 </x-responsive-nav-link>
+            @endif
+
+            @if (Auth::user()->role === 'admin_uid')
+                <div class="border-t border-gray-200 mt-1 pt-1">
+                    <p class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase">Kelola</p>
+                    <x-responsive-nav-link :href="route('manage.products')" :active="request()->routeIs('manage.products')">Produk</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('manage.warehouses')" :active="request()->routeIs('manage.warehouses')">Gudang</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('manage.warehouse-products')" :active="request()->routeIs('manage.warehouse-products')">Stok Gudang</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('manage.users')" :active="request()->routeIs('manage.users')">User</x-responsive-nav-link>
+                </div>
             @endif
         </div>
 
