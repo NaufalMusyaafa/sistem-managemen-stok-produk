@@ -53,7 +53,7 @@
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($items as $index => $item)
                                 <tr class="hover:bg-gray-50/50 transition-colors" wire:key="wp-{{ $item->id }}">
-                                    <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ $index + 1 }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ ($items->currentPage() - 1) * $items->perPage() + $loop->iteration }}</td>
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $item->warehouse->name }}</td>
                                     <td class="px-6 py-4">
                                         <p class="text-sm font-semibold text-gray-900">{{ $item->product->name }}</p>
@@ -92,8 +92,13 @@
                     </table>
                 </div>
                 <div class="bg-gray-50 border-t border-gray-100 px-6 py-3">
-                    <p class="text-xs text-gray-400">Total <span class="font-semibold text-gray-600">{{ count($items) }}</span> item · ROP dihitung otomatis: (Rata-rata Penggunaan × Lead Time) + Safety Stock</p>
+                    <p class="text-xs text-gray-400">Total <span class="font-semibold text-gray-600">{{ $items->total() }}</span> item · ROP dihitung otomatis: (Rata-rata Penggunaan × Lead Time) + Safety Stock</p>
                 </div>
+                @if ($items->hasPages())
+                    <div class="px-6 py-4 border-t border-gray-100">
+                        {{ $items->links('vendor.pagination.livewire-light') }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

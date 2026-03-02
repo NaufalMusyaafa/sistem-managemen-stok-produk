@@ -8,9 +8,12 @@ use App\Models\WarehouseProduct;
 use App\Services\InventoryService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ManageWarehouseProducts extends Component
 {
+    use WithPagination;
+
     public string $search = '';
     public string $filterWarehouse = '';
     public bool $isAdminUp3 = false;
@@ -207,9 +210,19 @@ class ManageWarehouseProducts extends Component
         $this->resetValidation();
     }
 
-    public function getFilteredItemsProperty()
+    public function updatingSearch(): void
     {
-        return WarehouseProduct::withoutGlobalScopes()
+        $this->resetPage();
+    }
+
+    public function updatingFilterWarehouse(): void
+    {
+        $this->resetPage();
+    }
+
+    public function render()
+    {
+        $items = WarehouseProduct::withoutGlobalScopes()
             ->with(['product', 'warehouse'])
             ->when($this->filterWarehouse, fn ($q) => $q->where('warehouse_id', $this->filterWarehouse))
             ->when($this->search, function ($q) {
@@ -220,13 +233,10 @@ class ManageWarehouseProducts extends Component
             })
             ->orderBy('warehouse_id')
             ->orderBy('product_id')
-            ->get();
-    }
+            ->paginate(10);
 
-    public function render()
-    {
         return view('livewire.manage-warehouse-products', [
-            'items'      => $this->filteredItems,
+            'items'      => $items,
             'warehouses' => Warehouse::orderBy('name')->get(),
             'products'   => Product::orderBy('name')->get(),
         ])->layout('layouts.app');

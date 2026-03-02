@@ -4,9 +4,12 @@ namespace App\Livewire;
 
 use App\Models\Product;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ManageProducts extends Component
 {
+    use WithPagination;
+
     public string $search = '';
 
     // Form fields
@@ -108,21 +111,23 @@ class ManageProducts extends Component
         $this->resetValidation();
     }
 
-    public function getFilteredProductsProperty()
+    public function updatingSearch(): void
     {
-        return Product::query()
+        $this->resetPage();
+    }
+
+    public function render()
+    {
+        $products = Product::query()
             ->when($this->search, function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
                   ->orWhere('sku', 'like', "%{$this->search}%");
             })
             ->orderBy('name')
-            ->get();
-    }
+            ->paginate(10);
 
-    public function render()
-    {
         return view('livewire.manage-products', [
-            'products' => $this->filteredProducts,
+            'products' => $products,
         ])->layout('layouts.app');
     }
 }

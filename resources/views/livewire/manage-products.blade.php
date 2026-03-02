@@ -44,7 +44,7 @@
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($products as $index => $product)
                                 <tr class="hover:bg-gray-50/50 transition-colors" wire:key="product-{{ $product->id }}">
-                                    <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ $index + 1 }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}</td>
                                     <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ $product->name }}</td>
                                     <td class="px-6 py-4"><span class="inline-flex px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-mono rounded-lg">{{ $product->sku }}</span></td>
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ $product->unit }}</td>
@@ -68,8 +68,13 @@
                     </table>
                 </div>
                 <div class="bg-gray-50 border-t border-gray-100 px-6 py-3">
-                    <p class="text-xs text-gray-400">Total <span class="font-semibold text-gray-600">{{ count($products) }}</span> produk</p>
+                    <p class="text-xs text-gray-400">Total <span class="font-semibold text-gray-600">{{ $products->total() }}</span> produk</p>
                 </div>
+                @if ($products->hasPages())
+                    <div class="px-6 py-4 border-t border-gray-100">
+                        {{ $products->links('vendor.pagination.livewire-light') }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>
