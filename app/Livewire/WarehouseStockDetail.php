@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\StockHistory;
 use App\Models\Warehouse;
 use App\Models\WarehouseProduct;
 use App\Services\InventoryService;
@@ -49,6 +50,11 @@ class WarehouseStockDetail extends Component
                 (int) $item->safety_stock
             );
 
+            // Get the latest stock history date for this item
+            $lastHistory = StockHistory::where('warehouse_product_id', $item->id)
+                ->latest('created_at')
+                ->first();
+
             $this->stockItems[$item->id] = [
                 'current_stock' => $item->current_stock,
                 'rop'           => $rop,
@@ -56,6 +62,7 @@ class WarehouseStockDetail extends Component
                 'product_name'  => $item->product->name,
                 'product_sku'   => $item->product->sku,
                 'product_unit'  => $item->product->unit,
+                'last_updated'  => $lastHistory ? $lastHistory->created_at->format('Y-m-d') : null,
             ];
         }
     }

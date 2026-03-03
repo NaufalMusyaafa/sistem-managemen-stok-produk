@@ -84,6 +84,7 @@
                                 <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">SKU</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Stok Terakhir</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">ROP</th>
+                                <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Terakhir Update</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4 w-44">Stok Sekarang</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Selisih</th>
                             </tr>
@@ -134,6 +135,21 @@
                                         </span>
                                     </td>
 
+                                    {{-- Terakhir Update --}}
+                                    <td class="px-6 py-4 text-center">
+                                        @if (isset($item['last_updated']) && $item['last_updated'])
+                                            <span class="text-sm text-gray-600">{{ \Carbon\Carbon::parse($item['last_updated'])->format('d/m/Y') }}</span>
+                                        @else
+                                            <span class="text-xs text-gray-400">Belum ada</span>
+                                        @endif
+                                        @if (!isset($item['last_updated']) || $item['last_updated'] === null || $item['last_updated'] !== now()->format('Y-m-d'))
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 text-xs font-semibold rounded-lg border border-orange-200/50 mt-1">
+                                                <span class="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
+                                                Belum Update
+                                            </span>
+                                        @endif
+                                    </td>
+
                                     {{-- Current Stock Input --}}
                                     <td class="px-6 py-4 text-center">
                                         <input
@@ -177,7 +193,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-16 text-center">
+                                    <td colspan="8" class="px-6 py-16 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
                                                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

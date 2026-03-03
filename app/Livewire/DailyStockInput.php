@@ -50,6 +50,11 @@ class DailyStockInput extends Component
                 (int) $item->safety_stock
             );
 
+            // Get the latest stock history date for this item
+            $lastHistory = StockHistory::where('warehouse_product_id', $item->id)
+                ->latest('created_at')
+                ->first();
+
             $this->stockInputs[$item->id] = [
                 'current_stock' => $item->current_stock,
                 'new_stock'     => $item->current_stock,
@@ -58,6 +63,7 @@ class DailyStockInput extends Component
                 'product_name'  => $item->product->name,
                 'product_sku'   => $item->product->sku,
                 'product_unit'  => $item->product->unit,
+                'last_updated'  => $lastHistory ? $lastHistory->created_at->format('Y-m-d') : null,
             ];
         }
     }
