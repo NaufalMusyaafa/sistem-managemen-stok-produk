@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Procurement;
 use App\Models\WarehouseProduct;
 use App\Models\StockHistory;
 use App\Services\InventoryService;
@@ -104,9 +105,10 @@ class DailyStockInput extends Component
                 }
 
                 // Check if there's an active procurement (on_order)
-                $isOrdered = $warehouseProduct->procurements()
+                $activeProcurements = $warehouseProduct->procurements()
                     ->whereIn('status', ['pending', 'approved', 'ordered'])
-                    ->exists();
+                    ->get();
+                $isOrdered = $activeProcurements->isNotEmpty();
 
                 // Calculate new status
                 $rop = $inventoryService->calculateROP(
@@ -114,6 +116,14 @@ class DailyStockInput extends Component
                     (int) $warehouseProduct->lead_time,
                     (int) $warehouseProduct->safety_stock
                 );
+
+                // Auto-complete procurement if stock rises above ROP
+                if ($isOrdered && $newStock > $rop) {
+                    foreach ($activeProcurements as $procurement) {
+                        $procurement->update(['status' => 'received']);
+                    }
+                    $isOrdered = false; // No longer on order
+                }
 
                 $newStatus = $inventoryService->checkStatus($newStock, $rop, $isOrdered);
 

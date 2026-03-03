@@ -25,6 +25,16 @@
                         <x-nav-link :href="route('manage.warehouse-products')" :active="request()->routeIs('manage.warehouse-products')">
                             {{ __('Kelola Stok') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
+                            {{ __('Pemesanan') }}
+                        </x-nav-link>
+                    @elseif (Auth::user()->role === 'manager')
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
+                            {{ __('Pemesanan') }}
+                        </x-nav-link>
                     @else
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
@@ -41,6 +51,7 @@
                                 <a href="{{ route('manage.products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.products') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Produk</a>
                                 <a href="{{ route('manage.warehouses') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouses') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Gudang</a>
                                 <a href="{{ route('manage.warehouse-products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouse-products') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Stok Gudang</a>
+                                <a href="{{ route('manage.orders') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.orders') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Pemesanan</a>
                                 <a href="{{ route('manage.users') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.users') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">User</a>
                             </div>
                         </div>
@@ -113,6 +124,16 @@
                 <x-responsive-nav-link :href="route('manage.warehouse-products')" :active="request()->routeIs('manage.warehouse-products')">
                     {{ __('Kelola Stok') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
+                    {{ __('Pemesanan') }}
+                </x-responsive-nav-link>
+            @elseif (Auth::user()->role === 'manager')
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
+                    {{ __('Pemesanan') }}
+                </x-responsive-nav-link>
             @else
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}
@@ -125,6 +146,7 @@
                     <x-responsive-nav-link :href="route('manage.products')" :active="request()->routeIs('manage.products')">Produk</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('manage.warehouses')" :active="request()->routeIs('manage.warehouses')">Gudang</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('manage.warehouse-products')" :active="request()->routeIs('manage.warehouse-products')">Stok Gudang</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">Pemesanan</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('manage.users')" :active="request()->routeIs('manage.users')">User</x-responsive-nav-link>
                 </div>
             @endif

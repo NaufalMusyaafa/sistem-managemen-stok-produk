@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Livewire\DailyStockInput;
 use App\Livewire\ManageProducts;
+use App\Livewire\ManageOrders;
 use App\Livewire\ManageUsers;
 use App\Livewire\ManageWarehouseProducts;
 use App\Livewire\ManageWarehouses;
@@ -55,6 +56,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/manage/warehouse-products', ManageWarehouseProducts::class)
         ->middleware('role:admin_uid,admin_up3')
         ->name('manage.warehouse-products');
+
+    // ──────────────────────────────────────────────
+    // All Roles — Order Management
+    // ──────────────────────────────────────────────
+    Route::get('/manage/orders', ManageOrders::class)
+        ->middleware('role:admin_uid,admin_up3,manager')
+        ->name('manage.orders');
 
     // ──────────────────────────────────────────────
     // Admin UID — CMS Management Pages

@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Mail\LowStockAlert;
+use App\Models\Procurement;
 use App\Models\User;
 use App\Models\WarehouseProduct;
+use App\Services\InventoryService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -25,6 +27,65 @@ class CheckLowStock extends Command
      */
     public function handle(): int
     {
+        // ──────────────────────────────────────────────
+        // 0. Auto-resolve expired procurements
+        // ──────────────────────────────────────────────
+        $this->info('🔄 Mengecek pesanan yang sudah melewati ETA...');
+
+        $expiredProcurements = Procurement::with('warehouseProduct')
+            ->whereIn('status', ['pending', 'approved', 'ordered'])
+            ->whereNotNull('eta_date')
+            ->where('eta_date', '<', now()->toDateString())
+            ->get();
+
+        $inventoryService = app(InventoryService::class);
+        $expiredCount = 0;
+
+        foreach ($expiredProcurements as $procurement) {
+            $wp = $procurement->warehouseProduct;
+            if (! $wp) {
+                continue;
+            }
+
+            $rop = $inventoryService->calculateROP(
+                (float) $wp->avg_daily_usage,
+                (int) $wp->lead_time,
+                (int) $wp->safety_stock
+            );
+
+            if ($wp->current_stock > $rop) {
+                // Stock is fine — mark as received
+                $procurement->update(['status' => 'received']);
+
+                // Check if there are other active procurements
+                $otherActive = Procurement::where('warehouse_product_id', $wp->id)
+                    ->whereIn('status', ['pending', 'approved', 'ordered'])
+                    ->where('id', '!=', $procurement->id)
+                    ->exists();
+
+                $wp->update(['status' => $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive)]);
+            } else {
+                // Stock still low — mark procurement as expired, item back to low_stock
+                $procurement->update(['status' => 'expired']);
+
+                // Check if there are other active procurements
+                $otherActive = Procurement::where('warehouse_product_id', $wp->id)
+                    ->whereIn('status', ['pending', 'approved', 'ordered'])
+                    ->where('id', '!=', $procurement->id)
+                    ->exists();
+
+                $wp->update(['status' => $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive)]);
+            }
+            $expiredCount++;
+        }
+
+        if ($expiredCount > 0) {
+            $this->warn("⏰ {$expiredCount} pesanan diproses (ETA sudah lewat).");
+        } else {
+            $this->info('✅ Tidak ada pesanan yang melewati ETA.');
+        }
+        $this->newLine();
+
         $this->info('🔍 Mengecek stok rendah di seluruh gudang...');
         $this->newLine();
 

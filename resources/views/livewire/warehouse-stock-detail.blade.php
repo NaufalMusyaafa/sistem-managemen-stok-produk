@@ -75,6 +75,9 @@
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Stok Saat Ini</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">ROP</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Status</th>
+                                @if (Auth::user()->role === 'manager')
+                                    <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4 w-32">Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -143,10 +146,26 @@
                                             </span>
                                         @endif
                                     </td>
+
+                                    {{-- Aksi (Manager Only) --}}
+                                    @if (Auth::user()->role === 'manager')
+                                        <td class="px-6 py-4 text-center">
+                                            @if ($item['status'] === 'low_stock')
+                                                <a href="{{ route('procurement.create', $id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                    Order
+                                                </a>
+                                            @elseif ($item['status'] === 'on_order')
+                                                <span class="text-xs text-blue-500 font-medium">Dalam Pesanan</span>
+                                            @else
+                                                <span class="text-xs text-gray-400">—</span>
+                                            @endif
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-16 text-center">
+                                    <td colspan="{{ Auth::user()->role === 'manager' ? 7 : 6 }}" class="px-6 py-16 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
                                                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
