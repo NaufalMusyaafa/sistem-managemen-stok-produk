@@ -11,12 +11,16 @@ Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris prod
 | Fitur | Deskripsi |
 |---|---|
 | **Role-Based Access Control** | 3 role: Admin UID (super admin), Admin UP3 (warehouse admin), Manager |
-| **Dashboard Monitoring** | Ringkasan stok seluruh gudang, status per gudang, peringatan stok rendah |
-| **Input Stok Harian** | Admin UP3 menginput stok harian untuk gudangnya, otomatis menghitung selisih |
+| **Dashboard Monitoring** | Ringkasan stok seluruh gudang, status per gudang, peringatan stok rendah (paginated) |
+| **Input Stok Harian** | Admin UP3 menginput stok harian, otomatis menghitung selisih, indikator "Belum Update" |
 | **Reorder Point (ROP)** | Kalkulasi otomatis ROP, peringatan visual ketika stok di bawah ROP |
-| **Pengadaan** | Manager membuat permintaan pengadaan untuk produk stok rendah |
+| **Pengadaan (Procurement)** | Manager membuat permintaan pengadaan + halaman daftar pesanan untuk semua role |
+| **Auto-Resolve Status** | Status `on_order` otomatis hilang saat stok naik di atas ROP atau ETA lewat |
+| **Notifikasi Email** | Email rangkuman stok rendah otomatis dikirim ke semua manager (terjadwal) |
+| **CRUD Management** | Admin UID mengelola produk, gudang, stok gudang, dan user |
 | **Audit Trail** | Setiap perubahan stok tercatat di `stock_histories` |
 | **Warehouse Scope** | Admin UP3 otomatis hanya melihat data gudangnya sendiri |
+| **Pagination** | Semua tabel data menggunakan pagination 10 item/halaman |
 
 ---
 
@@ -80,7 +84,26 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 4. Setup Database
+### 4. Konfigurasi Email (Opsional)
+
+Untuk mengaktifkan notifikasi email stok rendah, konfigurasi SMTP di `.env`:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=email-pengirim@gmail.com
+MAIL_PASSWORD="xxxx xxxx xxxx xxxx"    # Gmail App Password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=email-pengirim@gmail.com
+MAIL_FROM_NAME="StokMonitor"
+
+STOCK_CHECK_TIME=17:00    # Waktu cek stok harian (WIB, format HH:MM)
+```
+
+> **Catatan:** Akun pengirim email **tidak perlu** terdaftar sebagai user di sistem. Email dikirim ke semua user dengan role `manager`.
+
+### 5. Setup Database
 
 Buat database MySQL terlebih dahulu:
 
@@ -95,16 +118,20 @@ php artisan migrate
 php artisan db:seed
 ```
 
-### 5. Build Frontend Assets
+### 6. Build Frontend Assets
 
 ```bash
 npm run build
 ```
 
-### 6. Jalankan Server
+### 7. Jalankan Server
 
 ```bash
+# Terminal 1: Laravel server
 php artisan serve
+
+# Terminal 2 (opsional): Scheduler untuk notifikasi email otomatis
+php artisan schedule:work
 ```
 
 Akses aplikasi di: **http://127.0.0.1:8000**
@@ -117,9 +144,9 @@ Seeder membuat 3 akun demo:
 
 | Email | Password | Role | Akses |
 |---|---|---|---|
-| `admin.uid@test.com` | `password` | Admin UID | Dashboard monitoring seluruh gudang |
+| `admin.uid@test.com` | `password` | Admin UID | Dashboard + CRUD management semua data |
 | `admin.medan@test.com` | `password` | Admin UP3 | Input stok harian (gudang sendiri) |
-| `manager@test.com` | `password` | Manager | Dashboard + form pengadaan |
+| `manager@test.com` | `password` | Manager | Dashboard + form pengadaan + daftar pesanan |
 
 ---
 
@@ -128,23 +155,32 @@ Seeder membuat 3 akun demo:
 ### Admin UID (Super Admin)
 - ✅ Melihat dashboard monitoring global (seluruh 10 gudang)
 - ✅ Melihat summary stok: Normal, Low Stock, On Order
-- ✅ Melihat tabel status per gudang
-- ✅ Melihat peringatan stok rendah (Top 10)
-- ❌ Tidak bisa edit stok
-- ❌ Tidak bisa membuat pengadaan
+- ✅ Melihat tabel status per gudang + detail stok per gudang
+- ✅ Melihat peringatan stok rendah (paginated, sortir defisit tertinggi)
+- ✅ Mengelola data: Produk, Gudang, Stok Gudang, User
+- ✅ Melihat daftar pesanan (Pemesanan)
+- ✅ Menandai pesanan sebagai diterima / membatalkan pesanan
+- ❌ Tidak bisa edit stok harian
 
 ### Admin UP3 (Warehouse Admin)
 - ✅ Input stok harian untuk **gudangnya saja** (auto-filtered)
 - ✅ Melihat warning stok di bawah ROP (visual merah)
+- ✅ Melihat indikator **"Belum Update"** untuk item yang belum diupdate hari ini
 - ✅ Simpan batch perubahan stok
-- ✅ Otomatis membuat audit trail (stock_histories)
+- ✅ Otomatis membuat audit trail (`stock_histories`)
+- ✅ Melihat halaman Kelola Stok (paginated)
+- ✅ Melihat daftar pesanan gudangnya (Pemesanan)
 - ❌ Tidak bisa akses dashboard global
 - ❌ Tidak bisa melihat data gudang lain
 
 ### Manager
 - ✅ Melihat dashboard monitoring global
-- ✅ Membuat permintaan pengadaan (`/procurement/{id}`)
-- ✅ Input detail vendor, tanggal order, ETA
+- ✅ Melihat detail stok per gudang + indikator "Belum Update"
+- ✅ Membuat permintaan pengadaan dari halaman detail gudang (tombol "Order")
+- ✅ Input detail vendor, tanggal order, ETA, catatan
+- ✅ Melihat daftar pesanan (Pemesanan)
+- ✅ Menandai pesanan sebagai diterima / membatalkan pesanan
+- ✅ Menerima notifikasi email stok rendah
 - ❌ Tidak bisa edit stok harian
 
 ---
@@ -206,7 +242,7 @@ erDiagram
         varchar vendor_contact "nullable"
         date order_date
         date eta_date "nullable"
-        enum status "pending | approved | ordered | received | cancelled"
+        string status "pending | received | cancelled | expired"
         text notes "nullable"
         timestamp created_at
         timestamp updated_at
@@ -251,13 +287,24 @@ erDiagram
 ```
 sistem-managemen-stok-produk/
 ├── app/
+│   ├── Console/Commands/
+│   │   └── CheckLowStock.php          # Command cek stok rendah + auto-resolve ETA expired
 │   ├── Http/
 │   │   ├── Controllers/Auth/          # Authentication controllers (Breeze)
 │   │   └── Middleware/
 │   │       └── CheckRole.php          # Role-based access middleware
 │   ├── Livewire/
-│   │   ├── DailyStockInput.php        # Komponen input stok harian
-│   │   └── ProcurementForm.php        # Komponen form pengadaan
+│   │   ├── DailyStockInput.php        # Input stok harian (Admin UP3)
+│   │   ├── LowStockTable.php          # Tabel peringatan stok rendah (paginated)
+│   │   ├── ManageOrders.php           # Daftar pesanan / pemesanan barang
+│   │   ├── ManageProducts.php         # CRUD produk (Admin UID)
+│   │   ├── ManageUsers.php            # CRUD user (Admin UID)
+│   │   ├── ManageWarehouseProducts.php # Kelola stok gudang (Admin UID/UP3)
+│   │   ├── ManageWarehouses.php       # CRUD gudang (Admin UID)
+│   │   ├── ProcurementForm.php        # Form pengadaan (Manager)
+│   │   └── WarehouseStockDetail.php   # Detail stok per gudang (read-only)
+│   ├── Mail/
+│   │   └── LowStockAlert.php          # Mailable notifikasi stok rendah
 │   ├── Models/
 │   │   ├── Scopes/
 │   │   │   └── WarehouseScope.php     # Global scope auto-filter per gudang
@@ -269,20 +316,34 @@ sistem-managemen-stok-produk/
 │   │   └── StockHistory.php
 │   └── Services/
 │       └── InventoryService.php       # ROP calculation & status checker
+├── config/
+│   └── stockcheck.php                 # Konfigurasi waktu cek stok (STOCK_CHECK_TIME)
 ├── database/
 │   ├── migrations/                    # 6 tabel utama + default Laravel
 │   └── seeders/
 │       └── DatabaseSeeder.php         # 10 gudang, 50 produk, 3 user, 500 pivot
 ├── resources/views/
-│   ├── dashboard.blade.php            # Dashboard monitoring (admin_uid & manager)
+│   ├── dashboard.blade.php            # Dashboard monitoring (Admin UID & Manager)
+│   ├── emails/
+│   │   └── low-stock-alert.blade.php  # Template email notifikasi stok rendah
 │   ├── layouts/
 │   │   ├── app.blade.php              # Layout utama (Breeze)
 │   │   └── navigation.blade.php       # Navigasi role-aware
-│   └── livewire/
-│       ├── daily-stock-input.blade.php # View input stok harian
-│       └── procurement-form.blade.php  # View form pengadaan
+│   ├── livewire/
+│   │   ├── daily-stock-input.blade.php     # View input stok harian
+│   │   ├── low-stock-table.blade.php       # View tabel stok rendah
+│   │   ├── manage-orders.blade.php         # View daftar pesanan
+│   │   ├── manage-products.blade.php       # View kelola produk
+│   │   ├── manage-users.blade.php          # View kelola user
+│   │   ├── manage-warehouse-products.blade.php # View kelola stok gudang
+│   │   ├── manage-warehouses.blade.php     # View kelola gudang
+│   │   ├── procurement-form.blade.php      # View form pengadaan
+│   │   └── warehouse-stock-detail.blade.php # View detail stok gudang
+│   └── vendor/pagination/
+│       └── livewire-light.blade.php        # Custom pagination (light theme)
 ├── routes/
 │   ├── web.php                        # Routing utama + Livewire
+│   ├── console.php                    # Scheduler (stock:check-low)
 │   └── auth.php                       # Auth routes (Breeze)
 └── bootstrap/
     └── app.php                        # Middleware alias registration
@@ -308,9 +369,23 @@ ROP = ceil((Avg Daily Usage × Lead Time) + Safety Stock)
 
 | Status | Kondisi |
 |---|---|
-| `normal` | `current_stock ≥ ROP` |
-| `low_stock` | `current_stock < ROP` dan belum ada pengadaan aktif |
-| `on_order` | `current_stock < ROP` dan sudah ada pengadaan aktif (pending/approved/ordered) |
+| `normal` | `current_stock > ROP` |
+| `low_stock` | `current_stock ≤ ROP` dan belum ada pengadaan aktif |
+| `on_order` | Ada pengadaan aktif (pending/approved/ordered) |
+
+### Status Procurement
+
+| Status | Deskripsi |
+|---|---|
+| `pending` | Pesanan dibuat, menunggu barang datang |
+| `received` | Barang diterima (otomatis saat stok > ROP, atau ditandai manual) |
+| `cancelled` | Pesanan dibatalkan oleh manager/admin |
+| `expired` | ETA sudah lewat tapi stok masih rendah |
+
+### Auto-Resolve Status
+
+- **Saat admin UP3 input stok harian:** Jika stok naik di atas ROP dan ada procurement aktif → procurement otomatis `received`, status item → `normal`
+- **Saat scheduler dijalankan (`stock:check-low`):** Jika ETA sudah lewat dan stok masih ≤ ROP → procurement → `expired`, status item → `low_stock`
 
 ---
 
@@ -324,6 +399,15 @@ php artisan serve
 
 # Terminal 2: Vite dev server
 npm run dev
+
+# Terminal 3 (opsional): Scheduler untuk email otomatis
+php artisan schedule:work
+```
+
+### Test Notifikasi Email Manual
+
+```bash
+php artisan stock:check-low
 ```
 
 ### Fresh Migration + Seed
@@ -336,7 +420,8 @@ php artisan migrate:fresh --seed
 
 ```bash
 php -l app/Livewire/DailyStockInput.php
-php -l app/Livewire/ProcurementForm.php
+php -l app/Livewire/ManageOrders.php
+php -l app/Console/Commands/CheckLowStock.php
 ```
 
 ---
