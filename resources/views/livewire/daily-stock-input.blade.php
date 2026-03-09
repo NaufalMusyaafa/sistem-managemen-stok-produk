@@ -87,6 +87,9 @@
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Terakhir Update</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4 w-44">Stok Sekarang</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Selisih</th>
+                                <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-4 w-12">
+                                    <span title="Konfirmasi stok tetap">✓</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -190,10 +193,27 @@
                                             <span class="text-xs text-gray-300">—</span>
                                         @endif
                                     </td>
+
+                                    {{-- Confirm Checkbox --}}
+                                    <td class="px-4 py-4 text-center">
+                                        @php
+                                            $alreadyUpdatedToday = isset($item['last_updated']) && $item['last_updated'] === now()->format('Y-m-d');
+                                        @endphp
+                                        @if ($alreadyUpdatedToday)
+                                            <span class="text-emerald-500" title="Sudah diupdate hari ini">✓</span>
+                                        @else
+                                            <input
+                                                type="checkbox"
+                                                wire:model.live="confirmed.{{ $id }}"
+                                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500/30 cursor-pointer"
+                                                title="Centang untuk konfirmasi stok tetap"
+                                            />
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-6 py-16 text-center">
+                                    <td colspan="9" class="px-6 py-16 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
                                                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
