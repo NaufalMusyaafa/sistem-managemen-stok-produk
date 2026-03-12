@@ -20,19 +20,19 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ──────────────────────────────────────────────
-        // 1. WAREHOUSES (10)
+        // 1. WAREHOUSES (10) — Sesuai Pola Organisasi PLN UID Sumatera Utara
         // ──────────────────────────────────────────────
         $warehouseNames = [
-            ['name' => 'Gudang UP3 Medan',       'location' => 'Medan, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Binjai',       'location' => 'Binjai, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Pematangsiantar', 'location' => 'Pematangsiantar, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Padang Sidempuan', 'location' => 'Padang Sidempuan, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Sibolga',      'location' => 'Sibolga, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Nias',          'location' => 'Gunungsitoli, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Rantau Prapat', 'location' => 'Rantau Prapat, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Kisaran',       'location' => 'Kisaran, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Lubuk Pakam',   'location' => 'Lubuk Pakam, Sumatera Utara'],
-            ['name' => 'Gudang UP3 Tebing Tinggi', 'location' => 'Tebing Tinggi, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Binjai',             'location' => 'Kota Binjai, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Lubuk Pakam',        'location' => 'Kab. Deli Serdang, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Bukit Barisan',      'location' => 'Kab. Karo, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Medan',              'location' => 'Kota Medan, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Medan Utara',        'location' => 'Kota Medan, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Nias',               'location' => 'Kota Gunung Sitoli, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Padangsidimpuan',    'location' => 'Kota Padang Sidempuan, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Pematang Siantar',   'location' => 'Kota Pematang Siantar, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Rantau Prapat',      'location' => 'Kab. Labuhanbatu, Sumatera Utara'],
+            ['name' => 'Gudang UP3 Sibolga',            'location' => 'Kota Sibolga, Sumatera Utara'],
         ];
 
         $warehouses = collect();
@@ -132,7 +132,7 @@ class DatabaseSeeder extends Seeder
             'email'        => 'admin.medan@test.com',
             'password'     => $defaultPassword,
             'role'         => 'admin_up3',
-            'warehouse_id' => $warehouses->first()->id,
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Medan')->id,
         ]);
 
         User::create([
@@ -153,7 +153,7 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'name'         => 'Manager Notifikasi',
-            'email'        => 'xoening07@gmail.com',
+            'email'        => '',
             'password'     => $defaultPassword,
             'role'         => 'manager',
             'warehouse_id' => null,
@@ -162,13 +162,17 @@ class DatabaseSeeder extends Seeder
         $this->command->info('✔ 4 Users created (password: "password").');
 
         // ──────────────────────────────────────────────
-        // 4. PIVOT SEEDING — warehouse_products (500)
+        // 4. PIVOT SEEDING — warehouse_products (10 per warehouse)
         //    70% Normal | 20% Low Stock | 10% On Order
         // ──────────────────────────────────────────────
         $totalPivots = 0;
+        $itemsPerWarehouse = 10;
 
         foreach ($warehouses as $warehouse) {
-            foreach ($products as $index => $product) {
+            // Pick 10 random products for this warehouse
+            $selectedProducts = $products->random($itemsPerWarehouse);
+
+            foreach ($selectedProducts as $product) {
                 // Determine status based on distribution
                 $rand = mt_rand(1, 100);
                 if ($rand <= 70) {
@@ -181,7 +185,7 @@ class DatabaseSeeder extends Seeder
 
                 // Realistic ROP parameters
                 $avgDailyUsage = round(mt_rand(1, 30) + (mt_rand(0, 99) / 100), 2);
-                $leadTime      = mt_rand(3, 30);       // 3 to 30 days
+                $leadTime      = mt_rand(3, 30);
                 $safetyStock   = mt_rand(10, 100);
 
                 // ROP = (avg_daily_usage * lead_time) + safety_stock
@@ -190,17 +194,14 @@ class DatabaseSeeder extends Seeder
                 // Set current_stock based on desired status
                 switch ($desiredStatus) {
                     case 'normal':
-                        // Stock is above ROP — between ROP+1 and ROP*3
                         $currentStock = mt_rand($reorderPoint + 1, $reorderPoint * 3);
                         break;
 
                     case 'low_stock':
-                        // Stock is below ROP — between 1 and ROP-1
                         $currentStock = mt_rand(1, max(1, $reorderPoint - 1));
                         break;
 
                     case 'on_order':
-                        // Stock is very low (near zero) — procurement already initiated
                         $currentStock = mt_rand(0, max(1, (int) ($reorderPoint * 0.2)));
                         break;
                 }
@@ -234,7 +235,7 @@ class DatabaseSeeder extends Seeder
             [
                 ['Warehouses', $warehouses->count()],
                 ['Products', $products->count()],
-                ['Users', 3],
+                ['Users', 4],
                 ['Warehouse-Product Pivots', $totalPivots],
             ]
         );
