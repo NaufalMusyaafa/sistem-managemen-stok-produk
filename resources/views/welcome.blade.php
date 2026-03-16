@@ -196,12 +196,7 @@
                                     <tr class="hover:bg-gray-50/50 transition-colors">
                                         <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ $index + 1 }}</td>
                                         <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-9 h-9 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                    <span class="text-xs font-bold text-indigo-600">{{ $index + 1 }}</span>
-                                                </div>
-                                                <span class="text-sm font-semibold text-gray-900">{{ $warehouse->name }}</span>
-                                            </div>
+                                            <span class="text-sm font-semibold text-gray-900">{{ $warehouse->name }}</span>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ $warehouse->location }}</td>
                                         <td class="px-6 py-4 text-center text-sm font-semibold text-gray-700">{{ $items->count() }}</td>
