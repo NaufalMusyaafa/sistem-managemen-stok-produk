@@ -7,11 +7,11 @@
                 <div class="shrink-0 flex items-center">
                     @if (Auth::user()->role === 'admin_up3')
                         <a href="{{ route('daily-stock') }}">
-                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                            <img src="{{ asset('images/logo-pln.png') }}" class="block h-9 w-auto" alt="Logo PLN">
                         </a>
                     @else
                         <a href="{{ route('dashboard') }}">
-                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                            <img src="{{ asset('images/logo-pln.png') }}" class="block h-9 w-auto" alt="Logo PLN">
                         </a>
                     @endif
                 </div>
@@ -43,7 +43,7 @@
 
                     @if (Auth::user()->role === 'admin_uid')
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" @click.outside="open = false" class="inline-flex items-center gap-1 px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none {{ request()->routeIs('manage.*') ? 'text-gray-900 border-b-2 border-indigo-400' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300' }}" style="padding-bottom: 18px;">
+                            <button @click="open = !open" @click.outside="open = false" class="inline-flex items-center gap-1 px-1 pt-1 pb-1 h-full text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none border-b-2 {{ request()->routeIs('manage.*') ? 'text-gray-900 border-indigo-400' : 'text-gray-500 hover:text-gray-700 border-transparent hover:border-gray-300' }}">
                                 Kelola
                                 <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                             </button>
