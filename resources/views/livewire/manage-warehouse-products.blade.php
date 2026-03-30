@@ -152,6 +152,23 @@
                             <input type="number" wire:model="current_stock" min="0" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"/>
                             @error('current_stock') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
+                        {{-- ROP Mode Toggle --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mode ROP <span class="text-red-500">*</span></label>
+                            <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+                                <button type="button" wire:click="$set('rop_mode', 'auto')"
+                                    class="flex-1 px-4 py-2.5 text-sm font-medium transition-colors {{ $rop_mode === 'auto' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                                    🔄 Otomatis
+                                </button>
+                                <button type="button" wire:click="$set('rop_mode', 'manual')"
+                                    class="flex-1 px-4 py-2.5 text-sm font-medium transition-colors border-l border-gray-300 {{ $rop_mode === 'manual' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                                    ✏️ Manual
+                                </button>
+                            </div>
+                        </div>
+
+                        @if ($rop_mode === 'auto')
+                        {{-- Auto ROP Fields --}}
                         <div class="grid grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Rata-rata Harian <span class="text-red-500">*</span></label>
@@ -169,7 +186,16 @@
                                 @error('safety_stock') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
-                        <p class="text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">💡 ROP dihitung otomatis: (Rata-rata Harian × Lead Time) + Safety Stock. Status juga dihitung otomatis berdasarkan Stok vs ROP.</p>
+                        <p class="text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">💡 ROP dihitung otomatis: (Rata-rata Harian × Lead Time) + Safety Stock.</p>
+                        @else
+                        {{-- Manual ROP Field --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Nilai ROP <span class="text-red-500">*</span></label>
+                            <input type="number" wire:model="manual_rop" min="1" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="Masukkan nilai ROP tetap"/>
+                            @error('manual_rop') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <p class="text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">💡 ROP menggunakan nilai tetap yang Anda masukkan. Stok di bawah ROP akan ditandai sebagai low stock.</p>
+                        @endif
                         <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" wire:click="$set('showModal', false)" class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Batal</button>
                             <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>

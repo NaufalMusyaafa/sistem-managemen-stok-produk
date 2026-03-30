@@ -13,7 +13,7 @@ Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris prod
 | **Role-Based Access Control** | 3 role: Admin UID (super admin), Admin UP3 (warehouse admin), Manager |
 | **Dashboard Monitoring** | Ringkasan stok seluruh gudang, status per gudang, peringatan stok rendah (paginated) |
 | **Input Stok Harian** | Admin UP3 menginput stok harian, otomatis menghitung selisih, indikator "Belum Update" |
-| **Reorder Point (ROP)** | Kalkulasi otomatis ROP, peringatan visual ketika stok di bawah ROP |
+| **Reorder Point (ROP)** | Dua mode: **Otomatis** (kalkulasi dari rata-rata harian × lead time + safety stock) atau **Manual** (nilai tetap) |
 | **Pengadaan (Procurement)** | Manager membuat permintaan pengadaan + halaman daftar pesanan untuk semua role |
 | **Auto-Resolve Status** | Status `on_order` otomatis hilang saat stok naik di atas ROP atau ETA lewat |
 | **Notifikasi Email** | Email rangkuman stok rendah otomatis dikirim ke semua manager (terjadwal) |

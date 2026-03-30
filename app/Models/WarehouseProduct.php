@@ -41,6 +41,7 @@ class WarehouseProduct extends Model
         'lead_time',
         'safety_stock',
         'reorder_point',
+        'rop_mode',
     ];
 
     /**

@@ -34,9 +34,11 @@ class ManageWarehouseProducts extends Component
     public string $product_sku = '';
     public string $product_unit = '';
     public int $current_stock = 0;
+    public string $rop_mode = 'auto';
     public float $avg_daily_usage = 1.0;
     public int $lead_time = 7;
     public int $safety_stock = 10;
+    public int $manual_rop = 0;
 
     public bool $showModal = false;
     public bool $showDeleteModal = false;
@@ -50,10 +52,16 @@ class ManageWarehouseProducts extends Component
             'warehouse_id'    => 'required|exists:warehouses,id',
             'product_name'    => 'required|string|max:255',
             'current_stock'   => 'required|integer|min:0',
-            'avg_daily_usage' => 'required|numeric|min:0.01',
-            'lead_time'       => 'required|integer|min:1',
-            'safety_stock'    => 'required|integer|min:0',
+            'rop_mode'        => 'required|in:auto,manual',
         ];
+
+        if ($this->rop_mode === 'manual') {
+            $rules['manual_rop'] = 'required|integer|min:1';
+        } else {
+            $rules['avg_daily_usage'] = 'required|numeric|min:0.01';
+            $rules['lead_time']       = 'required|integer|min:1';
+            $rules['safety_stock']    = 'required|integer|min:0';
+        }
 
         // SKU and unit required only for new items (not editing)
         if (! $this->editingId) {
@@ -99,9 +107,11 @@ class ManageWarehouseProducts extends Component
         $this->product_sku = $item->product->sku;
         $this->product_unit = $item->product->unit;
         $this->current_stock = $item->current_stock;
+        $this->rop_mode = $item->rop_mode ?? 'auto';
         $this->avg_daily_usage = (float) $item->avg_daily_usage;
         $this->lead_time = $item->lead_time;
         $this->safety_stock = $item->safety_stock;
+        $this->manual_rop = $item->reorder_point;
         $this->showModal = true;
     }
 
@@ -143,21 +153,34 @@ class ManageWarehouseProducts extends Component
         }
 
         $inventoryService = app(InventoryService::class);
-        $rop = $inventoryService->calculateROP(
-            $this->avg_daily_usage,
-            $this->lead_time,
-            $this->safety_stock
-        );
+
+        if ($this->rop_mode === 'manual') {
+            $rop = $this->manual_rop;
+            $avgDaily = 0;
+            $leadTime = 0;
+            $safetyStock = 0;
+        } else {
+            $rop = $inventoryService->calculateROP(
+                $this->avg_daily_usage,
+                $this->lead_time,
+                $this->safety_stock
+            );
+            $avgDaily = $this->avg_daily_usage;
+            $leadTime = $this->lead_time;
+            $safetyStock = $this->safety_stock;
+        }
+
         $status = $inventoryService->checkStatus($this->current_stock, $rop);
 
         $data = [
             'warehouse_id'    => $this->warehouse_id,
             'product_id'      => $productId,
             'current_stock'   => $this->current_stock,
-            'avg_daily_usage' => $this->avg_daily_usage,
-            'lead_time'       => $this->lead_time,
-            'safety_stock'    => $this->safety_stock,
+            'avg_daily_usage' => $avgDaily,
+            'lead_time'       => $leadTime,
+            'safety_stock'    => $safetyStock,
             'reorder_point'   => $rop,
+            'rop_mode'        => $this->rop_mode,
             'status'          => $status,
         ];
 
@@ -204,9 +227,11 @@ class ManageWarehouseProducts extends Component
         $this->product_sku = '';
         $this->product_unit = '';
         $this->current_stock = 0;
+        $this->rop_mode = 'auto';
         $this->avg_daily_usage = 1.0;
         $this->lead_time = 7;
         $this->safety_stock = 10;
+        $this->manual_rop = 0;
         $this->resetValidation();
     }
 
