@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon-pln.png') }}">
     <title>StokMonitor — Sistem Monitoring Stok Multi-Gudang</title>
     <meta name="description" content="Sistem monitoring stok multi-gudang untuk PT PLN (Persero) Unit Induk Distribusi Sumatera Utara">
     <link rel="preconnect" href="https://fonts.bunny.net">
