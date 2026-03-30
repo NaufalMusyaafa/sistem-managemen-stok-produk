@@ -126,6 +126,16 @@ npm run build
 
 ### 7. Jalankan Server
 
+**Cara 1 — Satu terminal (direkomendasikan):**
+
+```bash
+npm run start
+```
+
+Perintah ini menjalankan `php artisan serve` dan `php artisan schedule:work` secara bersamaan menggunakan `concurrently`.
+
+**Cara 2 — Dua terminal terpisah:**
+
 ```bash
 # Terminal 1: Laravel server
 php artisan serve
@@ -394,14 +404,11 @@ ROP = ceil((Avg Daily Usage × Lead Time) + Safety Stock)
 ### Menjalankan dengan Hot Reload (CSS/JS)
 
 ```bash
-# Terminal 1: Laravel server
-php artisan serve
+# Satu terminal: Server + Scheduler
+npm run start
 
-# Terminal 2: Vite dev server
+# Terminal tambahan: Vite dev server (hot reload CSS/JS)
 npm run dev
-
-# Terminal 3 (opsional): Scheduler untuk email otomatis
-php artisan schedule:work
 ```
 
 ### Test Notifikasi Email Manual
