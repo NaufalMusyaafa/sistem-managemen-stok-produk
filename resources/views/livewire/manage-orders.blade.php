@@ -14,7 +14,7 @@
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari produk, gudang, vendor..." class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all w-64"/>
                     </div>
-                    <select wire:model.live="filterStatus" class="py-2.5 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <select wire:model.live="filterStatus" class="min-w-[160px] py-2.5 px-3 pe-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                         <option value="">Semua Status</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
