@@ -28,12 +28,16 @@
                         <x-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
                             {{ __('Pemesanan') }}
                         </x-nav-link>
-                    @elseif (Auth::user()->role === 'manager')
+                    @elseif (Auth::user()->role === 'rent')
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
                         <x-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
                             {{ __('Pemesanan') }}
+                        </x-nav-link>
+                    @elseif (Auth::user()->role === 'manager')
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
                         </x-nav-link>
                     @else
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
@@ -65,7 +69,8 @@
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mr-3
                     {{ Auth::user()->role === 'admin_uid' ? 'bg-purple-100 text-purple-700' : '' }}
                     {{ Auth::user()->role === 'admin_up3' ? 'bg-blue-100 text-blue-700' : '' }}
-                    {{ Auth::user()->role === 'manager' ? 'bg-amber-100 text-amber-700' : '' }}
+                    {{ Auth::user()->role === 'rent' ? 'bg-amber-100 text-amber-700' : '' }}
+                    {{ Auth::user()->role === 'manager' ? 'bg-teal-100 text-teal-700' : '' }}
                 ">
                     {{ strtoupper(str_replace('_', ' ', Auth::user()->role)) }}
                 </span>
@@ -127,12 +132,16 @@
                 <x-responsive-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
                     {{ __('Pemesanan') }}
                 </x-responsive-nav-link>
-            @elseif (Auth::user()->role === 'manager')
+            @elseif (Auth::user()->role === 'rent')
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('manage.orders')" :active="request()->routeIs('manage.orders')">
                     {{ __('Pemesanan') }}
+                </x-responsive-nav-link>
+            @elseif (Auth::user()->role === 'manager')
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
                 </x-responsive-nav-link>
             @else
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">

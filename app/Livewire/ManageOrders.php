@@ -36,9 +36,9 @@ class ManageOrders extends Component
     {
         $procurement = Procurement::with('warehouseProduct')->findOrFail($id);
 
-        // Only manager or admin_uid can change status
+        // Only rent or admin_uid can change status
         $user = Auth::user();
-        if (! in_array($user->role, ['manager', 'admin_uid'])) {
+        if (! in_array($user->role, ['rent', 'admin_uid'])) {
             abort(403);
         }
 
@@ -76,7 +76,7 @@ class ManageOrders extends Component
         $procurement = Procurement::with('warehouseProduct')->findOrFail($id);
 
         $user = Auth::user();
-        if (! in_array($user->role, ['manager', 'admin_uid'])) {
+        if (! in_array($user->role, ['rent', 'admin_uid'])) {
             abort(403);
         }
 
@@ -133,7 +133,7 @@ class ManageOrders extends Component
 
         return view('livewire.manage-orders', [
             'orders' => $orders,
-            'canManage' => in_array($user->role, ['manager', 'admin_uid']),
+            'canManage' => in_array($user->role, ['rent', 'admin_uid']),
         ])->layout('layouts.app');
     }
 }

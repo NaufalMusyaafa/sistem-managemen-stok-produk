@@ -49,7 +49,8 @@
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
                                             {{ $user->role === 'admin_uid' ? 'bg-purple-100 text-purple-700' : '' }}
                                             {{ $user->role === 'admin_up3' ? 'bg-blue-100 text-blue-700' : '' }}
-                                            {{ $user->role === 'manager' ? 'bg-amber-100 text-amber-700' : '' }}
+                                            {{ $user->role === 'rent' ? 'bg-amber-100 text-amber-700' : '' }}
+                                            {{ $user->role === 'manager' ? 'bg-teal-100 text-teal-700' : '' }}
                                         ">{{ strtoupper(str_replace('_', ' ', $user->role)) }}</span>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ $user->warehouse->name ?? '—' }}</td>
@@ -109,6 +110,7 @@
                                     <option value="">Pilih Role</option>
                                     <option value="admin_uid">Admin UID</option>
                                     <option value="admin_up3">Admin UP3</option>
+                                    <option value="rent">Rent</option>
                                     <option value="manager">Manager</option>
                                 </select>
                                 @error('role') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror

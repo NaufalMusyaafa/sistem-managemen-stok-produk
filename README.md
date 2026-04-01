@@ -10,13 +10,13 @@ Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris prod
 
 | Fitur | Deskripsi |
 |---|---|
-| **Role-Based Access Control** | 3 role: Admin UID (super admin), Admin UP3 (warehouse admin), Manager |
-| **Dashboard Monitoring** | Ringkasan stok seluruh gudang, status per gudang, peringatan stok rendah (paginated) |
+| **Role-Based Access Control** | 4 role: Admin UID (super admin), Admin UP3 (warehouse admin), Manager (monitoring), Rent (pengadaan) |
+| **Dashboard Monitoring** | Ringkasan stok seluruh gudang, status per gudang, peringatan stok rendah (paginated). Manager memiliki stat cards interaktif |
 | **Input Stok Harian** | Admin UP3 menginput stok harian, otomatis menghitung selisih, indikator "Belum Update" |
 | **Reorder Point (ROP)** | Dua mode: **Otomatis** (kalkulasi dari rata-rata harian × lead time + safety stock) atau **Manual** (nilai tetap) |
-| **Pengadaan (Procurement)** | Manager membuat permintaan pengadaan + halaman daftar pesanan untuk semua role |
+| **Pengadaan (Procurement)** | Rent membuat permintaan pengadaan + halaman daftar pesanan |
 | **Auto-Resolve Status** | Status `on_order` otomatis hilang saat stok naik di atas ROP atau ETA lewat |
-| **Notifikasi Email** | Email rangkuman stok rendah otomatis dikirim ke semua manager (terjadwal) |
+| **Notifikasi Email** | Email rangkuman stok rendah otomatis dikirim ke semua rent (terjadwal) |
 | **CRUD Management** | Admin UID mengelola produk, gudang, stok gudang, dan user |
 | **Audit Trail** | Setiap perubahan stok tercatat di `stock_histories` |
 | **Warehouse Scope** | Admin UP3 otomatis hanya melihat data gudangnya sendiri |
@@ -101,7 +101,7 @@ MAIL_FROM_NAME="StokMonitor"
 STOCK_CHECK_TIME=17:00    # Waktu cek stok harian (WIB, format HH:MM)
 ```
 
-> **Catatan:** Akun pengirim email **tidak perlu** terdaftar sebagai user di sistem. Email dikirim ke semua user dengan role `manager`.
+> **Catatan:** Akun pengirim email **tidak perlu** terdaftar sebagai user di sistem. Email dikirim ke semua user dengan role `rent`.
 
 ### 5. Setup Database
 
@@ -150,13 +150,15 @@ Akses aplikasi di: **http://127.0.0.1:8000**
 
 ## 👥 Akun Demo
 
-Seeder membuat 3 akun demo:
+Seeder membuat 3 akun demo (setelah migration, role `manager` di-rename ke `rent`):
 
 | Email | Password | Role | Akses |
 |---|---|---|---|
 | `admin.uid@test.com` | `password` | Admin UID | Dashboard + CRUD management semua data |
 | `admin.medan@test.com` | `password` | Admin UP3 | Input stok harian (gudang sendiri) |
-| `manager@test.com` | `password` | Manager | Dashboard + form pengadaan + daftar pesanan |
+| `manager@test.com` | `password` | Rent | Dashboard + form pengadaan + daftar pesanan |
+
+> **Catatan:** Untuk menguji role **Manager** (monitoring), buat user baru dengan role `manager` melalui halaman Kelola User.
 
 ---
 
@@ -183,7 +185,16 @@ Seeder membuat 3 akun demo:
 - ❌ Tidak bisa akses dashboard global
 - ❌ Tidak bisa melihat data gudang lain
 
-### Manager
+### Manager (Monitoring)
+- ✅ Melihat dashboard monitoring dengan **stat cards interaktif** (Stok Normal, Stok Rendah, Dalam Pesanan, Total Stok Rendah)
+- ✅ Klik stat card → halaman detail berisi daftar item dari semua gudang dengan status tersebut
+- ✅ Halaman detail: tabel dengan search bar, filter gudang, dan pagination
+- ✅ Halaman "Total Stok Rendah" memiliki kolom status (Belum Order / Sudah Order)
+- ✅ Melihat tabel status per gudang + detail stok per gudang
+- ❌ Tidak bisa membuat pesanan / pengadaan
+- ❌ Tidak bisa edit stok harian
+
+### Rent (Pengadaan)
 - ✅ Melihat dashboard monitoring global
 - ✅ Melihat detail stok per gudang + indikator "Belum Update"
 - ✅ Membuat permintaan pengadaan dari halaman detail gudang (tombol "Order")
@@ -213,7 +224,7 @@ erDiagram
         bigint id PK
         varchar name
         varchar email UK
-        enum role "admin_up3 | admin_uid | manager"
+        enum role "admin_up3 | admin_uid | rent | manager"
         bigint warehouse_id FK "nullable"
         varchar password
         timestamp created_at
@@ -311,7 +322,8 @@ sistem-managemen-stok-produk/
 │   │   ├── ManageUsers.php            # CRUD user (Admin UID)
 │   │   ├── ManageWarehouseProducts.php # Kelola stok gudang (Admin UID/UP3)
 │   │   ├── ManageWarehouses.php       # CRUD gudang (Admin UID)
-│   │   ├── ProcurementForm.php        # Form pengadaan (Manager)
+│   │   ├── ProcurementForm.php        # Form pengadaan (Rent)
+│   │   ├── StatusDetail.php           # Detail item per status (Manager)
 │   │   └── WarehouseStockDetail.php   # Detail stok per gudang (read-only)
 │   ├── Mail/
 │   │   └── LowStockAlert.php          # Mailable notifikasi stok rendah
@@ -333,7 +345,8 @@ sistem-managemen-stok-produk/
 │   └── seeders/
 │       └── DatabaseSeeder.php         # 10 gudang, 50 produk, 3 user, 500 pivot
 ├── resources/views/
-│   ├── dashboard.blade.php            # Dashboard monitoring (Admin UID & Manager)
+│   ├── dashboard.blade.php            # Dashboard monitoring (Admin UID & Rent)
+│   ├── dashboard-manager.blade.php    # Dashboard monitoring (Manager — stat cards interaktif)
 │   ├── emails/
 │   │   └── low-stock-alert.blade.php  # Template email notifikasi stok rendah
 │   ├── layouts/
@@ -348,6 +361,7 @@ sistem-managemen-stok-produk/
 │   │   ├── manage-warehouse-products.blade.php # View kelola stok gudang
 │   │   ├── manage-warehouses.blade.php     # View kelola gudang
 │   │   ├── procurement-form.blade.php      # View form pengadaan
+│   │   ├── status-detail.blade.php          # View detail item per status
 │   │   └── warehouse-stock-detail.blade.php # View detail stok gudang
 │   └── vendor/pagination/
 │       └── livewire-light.blade.php        # Custom pagination (light theme)
@@ -441,7 +455,7 @@ Seeder mengisi database dengan data realistis:
 |---|---|---|
 | Gudang | 10 | UP3 di Sumatera Utara (Medan, Binjai, P. Siantar, dll.) |
 | Produk | 50 | Peralatan kelistrikan (kabel, trafo, meter, arrester, dll.) |
-| User | 3 | 1 Admin UID, 1 Admin UP3, 1 Manager |
+| User | 3 | 1 Admin UID, 1 Admin UP3, 1 Rent (sebelumnya Manager) |
 | Stok (pivot) | 500 | 50 produk × 10 gudang |
 | Distribusi status | 70/20/10 | ~70% normal, ~20% low_stock, ~10% on_order |
 

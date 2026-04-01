@@ -76,7 +76,7 @@
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">ROP</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Terakhir Update</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Status</th>
-                                @if (Auth::user()->role === 'manager')
+                                @if (Auth::user()->role === 'rent')
                                     <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4 w-32">Aksi</th>
                                 @endif
                             </tr>
@@ -165,8 +165,8 @@
                                         @endif
                                     </td>
 
-                                    {{-- Aksi (Manager Only) --}}
-                                    @if (Auth::user()->role === 'manager')
+                                    {{-- Aksi (Rent Only) --}}
+                                    @if (Auth::user()->role === 'rent')
                                         <td class="px-6 py-4 text-center">
                                             @if ($item['status'] === 'low_stock')
                                                 <a href="{{ route('procurement.create', $id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">

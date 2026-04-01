@@ -99,7 +99,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user is a manager.
+     * Check if the user is a rent (formerly manager).
+     */
+    public function isRent(): bool
+    {
+        return $this->role === 'rent';
+    }
+
+    /**
+     * Check if the user is a manager (monitoring role).
      */
     public function isManager(): bool
     {

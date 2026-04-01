@@ -8,6 +8,7 @@ use App\Livewire\ManageUsers;
 use App\Livewire\ManageWarehouseProducts;
 use App\Livewire\ManageWarehouses;
 use App\Livewire\ProcurementForm;
+use App\Livewire\StatusDetail;
 use App\Livewire\WarehouseStockDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,10 @@ Route::get('/dashboard', function () {
     // Redirect admin_up3 to their daily-stock page
     if (Auth::user() && Auth::user()->role === 'admin_up3') {
         return redirect()->route('daily-stock');
+    }
+    // Manager (new monitoring role) uses a different dashboard view
+    if (Auth::user() && Auth::user()->role === 'manager') {
+        return view('dashboard-manager');
     }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -37,17 +42,17 @@ Route::middleware('auth')->group(function () {
         ->name('daily-stock');
 
     // ──────────────────────────────────────────────
-    // Manager — Procurement Form
+    // Rent — Procurement Form
     // ──────────────────────────────────────────────
     Route::get('/procurement/{id}', ProcurementForm::class)
-        ->middleware('role:manager')
+        ->middleware('role:rent')
         ->name('procurement.create');
 
     // ──────────────────────────────────────────────
-    // Admin UID & Manager — Warehouse Stock Detail
+    // Admin UID, Rent & Manager — Warehouse Stock Detail
     // ──────────────────────────────────────────────
     Route::get('/warehouse/{id}', WarehouseStockDetail::class)
-        ->middleware('role:admin_uid,manager')
+        ->middleware('role:admin_uid,rent,manager')
         ->name('warehouse.detail');
 
     // ──────────────────────────────────────────────
@@ -58,11 +63,18 @@ Route::middleware('auth')->group(function () {
         ->name('manage.warehouse-products');
 
     // ──────────────────────────────────────────────
-    // All Roles — Order Management
+    // Admin UID, Admin UP3, Rent — Order Management
     // ──────────────────────────────────────────────
     Route::get('/manage/orders', ManageOrders::class)
-        ->middleware('role:admin_uid,admin_up3,manager')
+        ->middleware('role:admin_uid,admin_up3,rent')
         ->name('manage.orders');
+
+    // ──────────────────────────────────────────────
+    // Manager (new) — Status Detail Pages
+    // ──────────────────────────────────────────────
+    Route::get('/status/{type}', StatusDetail::class)
+        ->middleware('role:manager')
+        ->name('status.detail');
 
     // ──────────────────────────────────────────────
     // Admin UID — CMS Management Pages

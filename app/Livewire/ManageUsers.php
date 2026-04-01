@@ -36,7 +36,7 @@ class ManageUsers extends Component
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|' . $uniqueEmail,
             'password'     => $passwordRule,
-            'role'         => 'required|in:admin_uid,admin_up3,manager',
+            'role'         => 'required|in:admin_uid,admin_up3,rent,manager',
             'warehouse_id' => 'nullable|exists:warehouses,id',
         ];
     }

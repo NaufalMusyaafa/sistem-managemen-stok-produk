@@ -131,12 +131,12 @@ class CheckLowStock extends Command
         );
 
         // ──────────────────────────────────────────────
-        // 3. Kirim email ke semua manager
+        // 3. Kirim email ke semua rent
         // ──────────────────────────────────────────────
-        $managers = User::where('role', 'manager')->get();
+        $managers = User::where('role', 'rent')->get();
 
         if ($managers->isEmpty()) {
-            $this->error('❌ Tidak ada user dengan role "manager". Email tidak dikirim.');
+            $this->error('❌ Tidak ada user dengan role "rent". Email tidak dikirim.');
             return self::FAILURE;
         }
 
