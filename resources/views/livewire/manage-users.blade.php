@@ -11,9 +11,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="relative">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari user..." class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all w-64"/>
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari user..." class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all w-64"/>
                 </div>
-                <button wire:click="openCreate" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 transition-all shadow-sm">
+                <button wire:click="openCreate" class="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2 transition-all shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Tambah User
                 </button>
@@ -47,7 +47,7 @@
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ $user->email }}</td>
                                     <td class="px-6 py-4 text-center">
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
-                                            {{ $user->role === 'admin_uid' ? 'bg-purple-100 text-purple-700' : '' }}
+                                            {{ $user->role === 'admin_uid' ? 'bg-cyan-100 text-cyan-700' : '' }}
                                             {{ $user->role === 'admin_up3' ? 'bg-blue-100 text-blue-700' : '' }}
                                             {{ $user->role === 'rent' ? 'bg-amber-100 text-amber-700' : '' }}
                                             {{ $user->role === 'manager' ? 'bg-teal-100 text-teal-700' : '' }}
@@ -56,7 +56,7 @@
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ $user->warehouse->name ?? '—' }}</td>
                                     <td class="px-6 py-4 text-center">
                                         <div class="inline-flex items-center gap-1">
-                                            <button wire:click="openEdit({{ $user->id }})" class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit">
+                                            <button wire:click="openEdit({{ $user->id }})" class="p-2 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors" title="Edit">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                             </button>
                                             @if ($user->id !== auth()->id())
@@ -90,23 +90,23 @@
                     <form wire:submit="save" class="space-y-5">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="name" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="Nama lengkap"/>
+                            <input type="text" wire:model="name" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500" placeholder="Nama lengkap"/>
                             @error('name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-500">*</span></label>
-                            <input type="email" wire:model="email" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="email@example.com"/>
+                            <input type="email" wire:model="email" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500" placeholder="email@example.com"/>
                             @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Password {{ $editingId ? '(kosongkan jika tidak diubah)' : '' }} <span class="{{ $editingId ? '' : 'text-red-500' }}">{{ $editingId ? '' : '*' }}</span></label>
-                            <input type="password" wire:model="password" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="Minimal 6 karakter"/>
+                            <input type="password" wire:model="password" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500" placeholder="Minimal 6 karakter"/>
                             @error('password') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Role <span class="text-red-500">*</span></label>
-                                <select wire:model="role" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                                <select wire:model="role" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
                                     <option value="">Pilih Role</option>
                                     <option value="admin_uid">Admin UID</option>
                                     <option value="admin_up3">Admin UP3</option>
@@ -117,7 +117,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Gudang</label>
-                                <select wire:model="warehouse_id" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                                <select wire:model="warehouse_id" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
                                     <option value="">Tidak ada</option>
                                     @foreach ($warehouses as $wh)
                                         <option value="{{ $wh->id }}">{{ $wh->name }}</option>
@@ -129,7 +129,7 @@
                         <p class="text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">💡 Role <strong>Admin UP3</strong> wajib memiliki gudang yang ditugaskan. Role lain bersifat opsional.</p>
                         <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" wire:click="$set('showModal', false)" class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Batal</button>
-                            <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>
+                            <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>
                         </div>
                     </form>
                 </div>

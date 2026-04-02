@@ -7,7 +7,7 @@
                     {{ __('Input Stok Harian') }}
                 </h2>
                 <span class="inline-flex items-center gap-1.5 text-sm text-gray-500">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     {{ Auth::user()->warehouse->name ?? 'Warehouse' }}
@@ -30,7 +30,7 @@
                         type="text"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Cari produk..."
-                        class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all w-64"
+                        class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all w-64"
                     />
                 </div>
 
@@ -38,7 +38,7 @@
                 <button
                     wire:click="saveAll"
                     wire:loading.attr="disabled"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                     <svg wire:loading.remove wire:target="saveAll" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -109,8 +109,8 @@
                                     {{-- Product Name --}}
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                                 </svg>
                                             </div>
@@ -162,7 +162,7 @@
                                             class="w-32 mx-auto text-center text-sm font-semibold rounded-lg border-2 px-3 py-2.5 transition-all focus:ring-2 focus:ring-offset-1
                                                 {{ $isBelowRop
                                                     ? 'border-red-400 bg-red-50 text-red-700 focus:ring-red-500/30 focus:border-red-500'
-                                                    : 'border-gray-200 bg-white text-gray-900 focus:ring-indigo-500/30 focus:border-indigo-500'
+                                                    : 'border-gray-200 bg-white text-gray-900 focus:ring-teal-500/30 focus:border-teal-500'
                                                 }}"
                                         />
                                         @if ($isBelowRop)
@@ -205,7 +205,7 @@
                                             <input
                                                 type="checkbox"
                                                 wire:model.live="confirmed.{{ $id }}"
-                                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500/30 cursor-pointer"
+                                                class="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500/30 cursor-pointer"
                                                 title="Centang untuk konfirmasi stok tetap"
                                             />
                                         @endif

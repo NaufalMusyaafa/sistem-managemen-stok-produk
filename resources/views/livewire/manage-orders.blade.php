@@ -12,9 +12,9 @@
                 <div class="flex items-center gap-3">
                     <div class="relative">
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari produk, gudang, vendor..." class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all w-64"/>
+                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari produk, gudang, vendor..." class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all w-64"/>
                     </div>
-                    <select wire:model.live="filterStatus" class="min-w-[160px] py-2.5 px-3 pe-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <select wire:model.live="filterStatus" class="min-w-[160px] py-2.5 px-3 pe-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
                         <option value="">Semua Status</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
@@ -84,7 +84,7 @@
                                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-lg"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>Pending</span>
                                                 @break
                                             @case('approved')
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-lg"><span class="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>Approved</span>
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-teal-50 text-teal-700 text-xs font-semibold rounded-lg"><span class="w-1.5 h-1.5 bg-teal-500 rounded-full"></span>Approved</span>
                                                 @break
                                             @case('ordered')
                                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>Ordered</span>

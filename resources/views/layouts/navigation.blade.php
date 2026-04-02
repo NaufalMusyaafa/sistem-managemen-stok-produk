@@ -47,16 +47,16 @@
 
                     @if (Auth::user()->role === 'admin_uid')
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" @click.outside="open = false" class="inline-flex items-center gap-1 px-1 pt-1 pb-1 h-full text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none border-b-2 {{ request()->routeIs('manage.*') ? 'text-gray-900 border-indigo-400' : 'text-gray-500 hover:text-gray-700 border-transparent hover:border-gray-300' }}">
+                            <button @click="open = !open" @click.outside="open = false" class="inline-flex items-center gap-1 px-1 pt-1 pb-1 h-full text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none border-b-2 {{ request()->routeIs('manage.*') ? 'text-gray-900 border-teal-400' : 'text-gray-500 hover:text-gray-700 border-transparent hover:border-gray-300' }}">
                                 Kelola
                                 <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 z-50 mt-0 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black/5 py-1" style="display: none;">
-                                <a href="{{ route('manage.products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.products') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Produk</a>
-                                <a href="{{ route('manage.warehouses') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouses') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Gudang</a>
-                                <a href="{{ route('manage.warehouse-products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouse-products') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Stok Gudang</a>
-                                <a href="{{ route('manage.orders') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.orders') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Pemesanan</a>
-                                <a href="{{ route('manage.users') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.users') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">User</a>
+                                <a href="{{ route('manage.products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.products') ? 'bg-teal-50 text-teal-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Produk</a>
+                                <a href="{{ route('manage.warehouses') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouses') ? 'bg-teal-50 text-teal-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Gudang</a>
+                                <a href="{{ route('manage.warehouse-products') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.warehouse-products') ? 'bg-teal-50 text-teal-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Stok Gudang</a>
+                                <a href="{{ route('manage.orders') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.orders') ? 'bg-teal-50 text-teal-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">Pemesanan</a>
+                                <a href="{{ route('manage.users') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('manage.users') ? 'bg-teal-50 text-teal-700 font-semibold' : 'text-gray-700 hover:bg-gray-50' }}">User</a>
                             </div>
                         </div>
                     @endif
@@ -67,7 +67,7 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <!-- Role Badge -->
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mr-3
-                    {{ Auth::user()->role === 'admin_uid' ? 'bg-purple-100 text-purple-700' : '' }}
+                    {{ Auth::user()->role === 'admin_uid' ? 'bg-cyan-100 text-cyan-700' : '' }}
                     {{ Auth::user()->role === 'admin_up3' ? 'bg-blue-100 text-blue-700' : '' }}
                     {{ Auth::user()->role === 'rent' ? 'bg-amber-100 text-amber-700' : '' }}
                     {{ Auth::user()->role === 'manager' ? 'bg-teal-100 text-teal-700' : '' }}

@@ -24,11 +24,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari produk, SKU, gudang..."
-                            class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all w-full"/>
+                            class="pl-9 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all w-full"/>
                     </div>
 
                     {{-- Filter Gudang --}}
-                    <select wire:model.live="filterWarehouse" class="min-w-[180px] py-2.5 px-3 pe-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <select wire:model.live="filterWarehouse" class="min-w-[180px] py-2.5 px-3 pe-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
                         <option value="">Semua Gudang</option>
                         @foreach ($warehouses as $wh)
                             <option value="{{ $wh->id }}">{{ $wh->name }}</option>
@@ -67,7 +67,7 @@
                                     <td class="px-6 py-4">
                                         <div>
                                             <p class="text-sm font-semibold text-gray-900">{{ $item->product->name ?? '-' }}</p>
-                                            <p class="text-xs text-indigo-500 mt-0.5">{{ $item->product->unit ?? '' }}</p>
+                                            <p class="text-xs text-teal-500 mt-0.5">{{ $item->product->unit ?? '' }}</p>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600 font-mono">{{ $item->product->sku ?? '-' }}</td>

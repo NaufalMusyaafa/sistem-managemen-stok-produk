@@ -9,17 +9,17 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
             {{-- Welcome Banner --}}
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl shadow-indigo-500/20">
+            <div class="bg-gradient-to-r from-teal-600 to-cyan-600 rounded-2xl p-8 text-white shadow-xl shadow-teal-500/20">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-2xl font-bold">Selamat Datang, {{ Auth::user()->name }}!</h3>
-                        <p class="text-indigo-100 mt-1">
+                        <p class="text-teal-100 mt-1">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm mt-2">
                                 {{ strtoupper(str_replace('_', ' ', Auth::user()->role)) }}
                             </span>
                         </p>
                     </div>
-                    <div class="hidden sm:flex items-center gap-2 text-indigo-100 text-sm">
+                    <div class="hidden sm:flex items-center gap-2 text-teal-100 text-sm">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -108,7 +108,7 @@
             <div class="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                         Status Per Gudang
@@ -141,12 +141,12 @@
                                     $wLow = $items->where('status', 'low_stock')->count();
                                     $wOrder = $items->where('status', 'on_order')->count();
                                 @endphp
-                                <tr class="hover:bg-indigo-50/50 transition-colors cursor-pointer group" onclick="window.location='{{ route('warehouse.detail', $warehouse->id) }}'">
+                                <tr class="hover:bg-teal-50/50 transition-colors cursor-pointer group" onclick="window.location='{{ route('warehouse.detail', $warehouse->id) }}'">
                                     <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
-                                            <span class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ $warehouse->name }}</span>
-                                            <svg class="w-4 h-4 text-gray-300 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <span class="text-sm font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">{{ $warehouse->name }}</span>
+                                            <svg class="w-4 h-4 text-gray-300 group-hover:text-teal-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </div>

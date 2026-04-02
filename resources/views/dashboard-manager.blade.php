@@ -109,7 +109,7 @@
             <div class="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                         Status Per Gudang
@@ -142,12 +142,12 @@
                                     $wLow = $items->where('status', 'low_stock')->count();
                                     $wOrder = $items->where('status', 'on_order')->count();
                                 @endphp
-                                <tr class="hover:bg-indigo-50/50 transition-colors cursor-pointer group" onclick="window.location='{{ route('warehouse.detail', $warehouse->id) }}'">
+                                <tr class="hover:bg-teal-50/50 transition-colors cursor-pointer group" onclick="window.location='{{ route('warehouse.detail', $warehouse->id) }}'">
                                     <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
-                                            <span class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ $warehouse->name }}</span>
-                                            <svg class="w-4 h-4 text-gray-300 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <span class="text-sm font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">{{ $warehouse->name }}</span>
+                                            <svg class="w-4 h-4 text-gray-300 group-hover:text-teal-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </div>

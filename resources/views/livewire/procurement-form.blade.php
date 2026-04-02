@@ -2,9 +2,20 @@
     {{-- Page Heading --}}
     <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Form Pengadaan') }}
-            </h2>
+            <div class="flex items-center gap-4">
+                @if ($warehouseProduct)
+                    <a href="{{ route('warehouse.detail', $warehouseProduct->warehouse->id) }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-teal-600 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Kembali
+                    </a>
+                    <div class="h-6 border-l border-gray-200"></div>
+                @endif
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ __('Form Pengadaan') }}
+                </h2>
+            </div>
         </div>
     </header>
 
@@ -86,7 +97,7 @@
             {{-- Form Card --}}
             <form wire:submit="submit" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-8 space-y-6">
                 <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     Detail Pengadaan
@@ -103,7 +114,7 @@
                             id="vendor_name"
                             wire:model="vendor_name"
                             placeholder="Masukkan nama vendor..."
-                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400"
+                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-gray-400"
                         />
                         @error('vendor_name')
                             <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
@@ -113,14 +124,13 @@
                     {{-- Vendor Contact --}}
                     <div class="sm:col-span-2">
                         <label for="vendor_contact" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Kontak Vendor
+                            Nomor Kontrak Pengadaan
                         </label>
                         <input
                             type="text"
                             id="vendor_contact"
                             wire:model="vendor_contact"
-                            placeholder="No. telepon atau email vendor..."
-                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400"
+                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                         />
                         @error('vendor_contact')
                             <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
@@ -136,7 +146,7 @@
                             type="date"
                             id="order_date"
                             wire:model="order_date"
-                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                         />
                         @error('order_date')
                             <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
@@ -152,7 +162,7 @@
                             type="date"
                             id="eta_date"
                             wire:model="eta_date"
-                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                         />
                         @error('eta_date')
                             <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
@@ -169,7 +179,7 @@
                             wire:model="notes"
                             rows="3"
                             placeholder="Catatan tambahan (opsional)..."
-                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none placeholder:text-gray-400"
+                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all resize-none placeholder:text-gray-400"
                         ></textarea>
                         @error('notes')
                             <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
@@ -182,7 +192,7 @@
                     <button
                         type="submit"
                         wire:loading.attr="disabled"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <svg wire:loading.remove wire:target="submit" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
