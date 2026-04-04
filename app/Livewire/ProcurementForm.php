@@ -92,7 +92,7 @@ class ProcurementForm extends Component
                 'vendor_contact'       => $this->vendor_contact ?: null,
                 'order_date'           => $this->order_date,
                 'eta_date'             => $this->eta_date ?: null,
-                'status'               => 'pending',
+                'status'               => 'ordered',
                 'notes'                => $this->notes ?: null,
             ]);
 

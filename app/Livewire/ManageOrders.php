@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Procurement;
-use App\Models\WarehouseProduct;
 use App\Services\InventoryService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -18,6 +17,11 @@ class ManageOrders extends Component
 
     public string $successMessage = '';
 
+    // Detail panel
+    public ?int $selectedOrderId = null;
+    public ?Procurement $selectedOrder = null;
+    public string $newEtaDate = '';
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -29,17 +33,71 @@ class ManageOrders extends Component
     }
 
     /**
-     * Mark a procurement as received (completed).
-     * Also updates the warehouse_product status.
+     * Open detail panel for a procurement.
+     */
+    public function openDetail(int $id): void
+    {
+        $this->selectedOrderId = $id;
+        $this->selectedOrder = Procurement::with([
+            'warehouseProduct.product',
+            'warehouseProduct.warehouse',
+            'user',
+        ])->findOrFail($id);
+        $this->newEtaDate = $this->selectedOrder->eta_date?->format('Y-m-d') ?? '';
+    }
+
+    /**
+     * Close detail panel.
+     */
+    public function closeDetail(): void
+    {
+        $this->selectedOrderId = null;
+        $this->selectedOrder = null;
+        $this->newEtaDate = '';
+        $this->successMessage = '';
+    }
+
+    /**
+     * Update the ETA date for a procurement.
+     */
+    public function updateEta(): void
+    {
+        $this->validate([
+            'newEtaDate' => 'required|date',
+        ], [
+            'newEtaDate.required' => 'Tanggal ETA wajib diisi.',
+            'newEtaDate.date'     => 'Format tanggal tidak valid.',
+        ]);
+
+        $procurement = Procurement::findOrFail($this->selectedOrderId);
+        $procurement->update(['eta_date' => $this->newEtaDate]);
+
+        $this->selectedOrder = $procurement->fresh([
+            'warehouseProduct.product',
+            'warehouseProduct.warehouse',
+            'user',
+        ]);
+        $this->newEtaDate = $this->selectedOrder->eta_date?->format('Y-m-d') ?? '';
+        $this->successMessage = 'Tanggal ETA berhasil diperbarui.';
+    }
+
+    /**
+     * Mark a procurement as received.
+     * User can mark as received at any time while status is still 'ordered'.
+     * Also updates the warehouse_product status accordingly.
      */
     public function markReceived(int $id): void
     {
         $procurement = Procurement::with('warehouseProduct')->findOrFail($id);
 
-        // Only rent or admin_uid can change status
         $user = Auth::user();
         if (! in_array($user->role, ['rent', 'admin_uid'])) {
             abort(403);
+        }
+
+        if ($procurement->status !== 'ordered') {
+            $this->successMessage = 'Pesanan ini tidak dapat ditandai sebagai diterima.';
+            return;
         }
 
         $procurement->update(['status' => 'received']);
@@ -54,14 +112,23 @@ class ManageOrders extends Component
                 (int) $wp->safety_stock
             );
 
-            // Check if there are other active procurements for this item
+            // Check if there are OTHER active (ordered) procurements for this item
             $otherActive = Procurement::where('warehouse_product_id', $wp->id)
-                ->whereIn('status', ['pending', 'approved', 'ordered'])
+                ->where('status', 'ordered')
                 ->where('id', '!=', $id)
                 ->exists();
 
             $newStatus = $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive);
             $wp->update(['status' => $newStatus]);
+        }
+
+        // Refresh detail panel if open
+        if ($this->selectedOrderId === $id) {
+            $this->selectedOrder = $procurement->fresh([
+                'warehouseProduct.product',
+                'warehouseProduct.warehouse',
+                'user',
+            ]);
         }
 
         $this->successMessage = 'Pesanan ditandai sebagai diterima.';
@@ -80,7 +147,12 @@ class ManageOrders extends Component
             abort(403);
         }
 
-        $procurement->update(['status' => 'cancelled']);
+        if ($procurement->status !== 'ordered') {
+            $this->successMessage = 'Pesanan ini tidak dapat dibatalkan.';
+            return;
+        }
+
+        $procurement->update(['status' => 'canceled']);
 
         // Re-evaluate warehouse product status
         $wp = $procurement->warehouseProduct;
@@ -93,12 +165,21 @@ class ManageOrders extends Component
             );
 
             $otherActive = Procurement::where('warehouse_product_id', $wp->id)
-                ->whereIn('status', ['pending', 'approved', 'ordered'])
+                ->where('status', 'ordered')
                 ->where('id', '!=', $id)
                 ->exists();
 
             $newStatus = $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive);
             $wp->update(['status' => $newStatus]);
+        }
+
+        // Refresh detail panel if open
+        if ($this->selectedOrderId === $id) {
+            $this->selectedOrder = $procurement->fresh([
+                'warehouseProduct.product',
+                'warehouseProduct.warehouse',
+                'user',
+            ]);
         }
 
         $this->successMessage = 'Pesanan berhasil dibatalkan.';
@@ -132,8 +213,8 @@ class ManageOrders extends Component
         $orders = $query->orderByDesc('created_at')->paginate(10);
 
         return view('livewire.manage-orders', [
-            'orders' => $orders,
-            'canManage' => in_array($user->role, ['rent', 'admin_uid']),
+            'orders'     => $orders,
+            'canManage'  => in_array($user->role, ['rent', 'admin_uid']),
         ])->layout('layouts.app');
     }
 }

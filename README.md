@@ -1,6 +1,4 @@
-# 📦 StokMonitor — Multi-Warehouse Inventory Monitoring System
-
-Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris produk kelistrikan. Dibangun dengan **Laravel 12**, **Livewire**, dan **Tailwind CSS**.
+Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris produk kelistrikan. Dibangun dengan **Laravel 12**, **Livewire**, dan **Tailwind CSS**. Menggunakan tema visual **Teal & Cyan** untuk estetika premium dan profesional.
 
 > Proyek ini mensimulasikan sistem manajemen stok untuk PLN (Perusahaan Listrik Negara) dengan 10 gudang UP3 di Sumatera Utara.
 
@@ -14,8 +12,9 @@ Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris prod
 | **Dashboard Monitoring** | Ringkasan stok seluruh gudang, status per gudang, peringatan stok rendah (paginated). Manager memiliki stat cards interaktif |
 | **Input Stok Harian** | Admin UP3 menginput stok harian, otomatis menghitung selisih, indikator "Belum Update" |
 | **Reorder Point (ROP)** | Dua mode: **Otomatis** (kalkulasi dari rata-rata harian × lead time + safety stock) atau **Manual** (nilai tetap) |
-| **Pengadaan (Procurement)** | Rent membuat permintaan pengadaan + halaman daftar pesanan |
-| **Auto-Resolve Status** | Status `on_order` otomatis hilang saat stok naik di atas ROP atau ETA lewat |
+| **Pengadaan (Procurement)** | Pembuatan permintaan pengadaan barang oleh role Rent dengan form detail vendor dan ETA |
+| **Manajemen Pesanan** | Daftar pesanan terpusat dengan modal detail interaktif, peringatan jatuh tempo (overdue), dan fitur update ETA |
+| **Auto-Resolve Status** | Status `on_order` otomatis kembali ke stok normal saat stok diupdate di atas ROP atau pesanan diterima |
 | **Notifikasi Email** | Email rangkuman stok rendah otomatis dikirim ke semua rent (terjadwal) |
 | **CRUD Management** | Admin UID mengelola produk, gudang, stok gudang, dan user |
 | **Audit Trail** | Setiap perubahan stok tercatat di `stock_histories` |
@@ -195,12 +194,13 @@ Seeder membuat 3 akun demo (setelah migration, role `manager` di-rename ke `rent
 - ❌ Tidak bisa edit stok harian
 
 ### Rent (Pengadaan)
-- ✅ Melihat dashboard monitoring global
+- ✅ Melihat dashboard monitoring global dengan tema Teal/Cyan yang modern
 - ✅ Melihat detail stok per gudang + indikator "Belum Update"
 - ✅ Membuat permintaan pengadaan dari halaman detail gudang (tombol "Order")
-- ✅ Input detail vendor, tanggal order, ETA, catatan
-- ✅ Melihat daftar pesanan (Pemesanan)
-- ✅ Menandai pesanan sebagai diterima / membatalkan pesanan
+- ✅ Input detail vendor, Nomor Kontrak Pengadaan, tanggal order, ETA, catatan
+- ✅ Melihat daftar pesanan (Pemesanan) dengan status yang disederhanakan
+- ✅ Mengelola pesanan: Klik baris untuk membuka **Modal Detail**, update ETA, Tandai Diterima, atau Batalkan
+- ✅ Baris pesanan berwarna merah jika status masih **Sedang Dipesan** namun sudah melewati tanggal ETA (Jatuh Tempo)
 - ✅ Menerima notifikasi email stok rendah
 - ❌ Tidak bisa edit stok harian
 
@@ -263,7 +263,7 @@ erDiagram
         varchar vendor_contact "nullable"
         date order_date
         date eta_date "nullable"
-        string status "pending | received | cancelled | expired"
+        enum status "ordered | received | canceled"
         text notes "nullable"
         timestamp created_at
         timestamp updated_at
@@ -317,7 +317,7 @@ sistem-managemen-stok-produk/
 │   ├── Livewire/
 │   │   ├── DailyStockInput.php        # Input stok harian (Admin UP3)
 │   │   ├── LowStockTable.php          # Tabel peringatan stok rendah (paginated)
-│   │   ├── ManageOrders.php           # Daftar pesanan / pemesanan barang
+│   │   ├── ManageOrders.php           # Daftar pesanan dengan modal detail & update ETA logic
 │   │   ├── ManageProducts.php         # CRUD produk (Admin UID)
 │   │   ├── ManageUsers.php            # CRUD user (Admin UID)
 │   │   ├── ManageWarehouseProducts.php # Kelola stok gudang (Admin UID/UP3)
@@ -355,7 +355,7 @@ sistem-managemen-stok-produk/
 │   ├── livewire/
 │   │   ├── daily-stock-input.blade.php     # View input stok harian
 │   │   ├── low-stock-table.blade.php       # View tabel stok rendah
-│   │   ├── manage-orders.blade.php         # View daftar pesanan
+│   │   ├── manage-orders.blade.php         # View daftar pesanan dengan centered modal pop-up
 │   │   ├── manage-products.blade.php       # View kelola produk
 │   │   ├── manage-users.blade.php          # View kelola user
 │   │   ├── manage-warehouse-products.blade.php # View kelola stok gudang
@@ -395,16 +395,15 @@ ROP = ceil((Avg Daily Usage × Lead Time) + Safety Stock)
 |---|---|
 | `normal` | `current_stock > ROP` |
 | `low_stock` | `current_stock ≤ ROP` dan belum ada pengadaan aktif |
-| `on_order` | Ada pengadaan aktif (pending/approved/ordered) |
+| `on_order` | Ada pengadaan aktif (status: `ordered`) |
 
 ### Status Procurement
 
 | Status | Deskripsi |
 |---|---|
-| `pending` | Pesanan dibuat, menunggu barang datang |
-| `received` | Barang diterima (otomatis saat stok > ROP, atau ditandai manual) |
-| `cancelled` | Pesanan dibatalkan oleh manager/admin |
-| `expired` | ETA sudah lewat tapi stok masih rendah |
+| `ordered` | Pesanan sedang dalam proses pengiriman (Sedang Dipesan) |
+| `received` | Barang telah diterima (Masuk ke stok gudang) |
+| `canceled` | Pesanan dibatalkan (Cancel) |
 
 ### Auto-Resolve Status
 
