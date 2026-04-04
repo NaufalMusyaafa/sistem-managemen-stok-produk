@@ -209,4 +209,38 @@
 
         </div>
     </div>
+
+    {{-- Success Pop-up Modal --}}
+    <div id="success-modal" style="display:none; position:fixed; inset:0; z-index:50; background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:16px; padding:32px; max-width:400px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+            <div style="width:56px; height:56px; background:#d1fae5; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+                <svg style="width:28px; height:28px; color:#059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h3 style="font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;">Pengadaan Berhasil!</h3>
+            <p id="success-message" style="font-size:14px; color:#6b7280; margin-bottom:24px;"></p>
+            <button id="success-ok-btn" style="padding:10px 32px; background:#0d9488; color:white; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s;" onmouseover="this.style.background='#0f766e'" onmouseout="this.style.background='#0d9488'">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('procurement-submitted', (data) => {
+                const payload = data[0];
+                const modal = document.getElementById('success-modal');
+                const message = document.getElementById('success-message');
+                const btn = document.getElementById('success-ok-btn');
+
+                message.textContent = payload.message;
+                modal.style.display = 'flex';
+
+                btn.onclick = () => {
+                    window.location.href = payload.redirectUrl;
+                };
+            });
+        });
+    </script>
 </div>

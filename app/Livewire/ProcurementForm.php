@@ -102,14 +102,11 @@ class ProcurementForm extends Component
             ]);
         });
 
-        $this->successMessage = 'Pengadaan berhasil dibuat! Status produk diperbarui menjadi "On Order".';
-
-        // Reset form
-        $this->reset(['vendor_name', 'vendor_contact', 'eta_date', 'notes']);
-        $this->order_date = now()->format('Y-m-d');
-
-        // Refresh the model
-        $this->warehouseProduct->refresh();
+        // Dispatch browser event for pop-up + redirect
+        $this->dispatch('procurement-submitted', [
+            'message' => 'Pengadaan berhasil dibuat! Status produk diperbarui menjadi "On Order".',
+            'redirectUrl' => route('warehouse.detail', $this->warehouseProduct->warehouse_id),
+        ]);
     }
 
     public function render()
