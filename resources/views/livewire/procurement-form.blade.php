@@ -26,12 +26,7 @@
             @if ($warehouseProduct)
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                        </div>
-                        <div class="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div>
                                 <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Produk</p>
                                 <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ $warehouseProduct->product->name }}</p>

@@ -117,16 +117,9 @@
                                 >
                                     <td class="px-6 py-4 text-sm text-gray-400 font-mono">{{ $items->firstItem() + $index }}</td>
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            @if ($isClickable)
-                                                <div class="w-7 h-7 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-teal-200 transition-colors">
-                                                    <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                                </div>
-                                            @endif
-                                            <div>
-                                                <p class="text-sm font-semibold {{ $isClickable ? 'text-teal-700 group-hover:text-teal-800' : 'text-gray-900' }}">{{ $item->product->name ?? '-' }}</p>
-                                                <p class="text-xs text-teal-500 mt-0.5">{{ $item->product->unit ?? '' }}</p>
-                                            </div>
+                                        <div>
+                                            <p class="text-sm font-semibold {{ $isClickable ? 'text-gray-900 group-hover:text-gray-700' : 'text-gray-900' }}">{{ $item->product->name ?? '-' }}</p>
+                                            <p class="text-xs text-teal-500 mt-0.5">{{ $item->product->unit ?? '' }}</p>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600 font-mono">{{ $item->product->sku ?? '-' }}</td>
@@ -231,12 +224,7 @@
                 <div class="px-6 py-5 space-y-4">
 
                     {{-- Product Card --}}
-                    <div class="bg-gray-50 rounded-xl p-4 flex items-center gap-4">
-                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                            </svg>
-                        </div>
+                    <div class="bg-gray-50 rounded-xl p-4">
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-gray-900 truncate" x-text="selectedItem?.name"></p>
                             <p class="text-xs text-gray-400 font-mono mt-0.5" x-text="selectedItem?.sku"></p>
