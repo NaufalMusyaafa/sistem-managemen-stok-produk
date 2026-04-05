@@ -126,11 +126,61 @@
                                 @endif
                                 @error('warehouse_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
-                            <div>
+                            <div
+                                x-data="{
+                                    timer: null,
+                                    debounceSearch() {
+                                        clearTimeout(this.timer);
+                                        this.timer = setTimeout(() => $wire.searchProducts(), 300);
+                                    },
+                                    selectSuggestion(id, name, sku, unit) {
+                                        $refs.productInput.value = name;
+                                        $wire.selectProduct(id);
+                                    }
+                                }"
+                                class="relative"
+                            >
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Produk <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="product_name" class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500" placeholder="Ketik nama produk..." {{ $editingId ? 'disabled' : '' }}/>
+                                <input
+                                    x-ref="productInput"
+                                    type="text"
+                                    wire:model="product_name"
+                                    class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                                    placeholder="Ketik nama produk..."
+                                    {{ $editingId ? 'disabled' : '' }}
+                                    autocomplete="off"
+                                    @input="debounceSearch()"
+                                    @blur="setTimeout(() => $wire.clearSuggestions(), 200)"
+                                />
+                                {{-- Autocomplete Dropdown --}}
+                                @if (count($productSuggestions) > 0)
+                                    <div class="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+                                        <ul class="max-h-52 overflow-y-auto divide-y divide-gray-50">
+                                            @foreach ($productSuggestions as $s)
+                                                <li>
+                                                    <button
+                                                        type="button"
+                                                        @mousedown.prevent="selectSuggestion({{ $s['id'] }}, '{{ addslashes($s['name']) }}', '{{ addslashes($s['sku']) }}', '{{ addslashes($s['unit']) }}')"
+                                                        class="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-teal-50 transition-colors text-left group"
+                                                    >
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-sm font-semibold text-gray-900 group-hover:text-teal-700 truncate">{{ $s['name'] }}</p>
+                                                            <p class="text-xs text-gray-400 font-mono mt-0.5">{{ $s['sku'] }} · {{ $s['unit'] }}</p>
+                                                        </div>
+                                                        <span class="text-xs text-teal-500 font-medium mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">Pilih</span>
+                                                    </button>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                        <div class="px-4 py-2 bg-gray-50 border-t border-gray-100">
+                                            <p class="text-xs text-gray-400">{{ count($productSuggestions) }} produk ditemukan · Ketik nama baru jika ingin membuat produk baru</p>
+                                        </div>
+                                    </div>
+                                @endif
                                 @error('product_name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
+
+
                         </div>
                         @unless ($editingId)
                         <div class="grid grid-cols-2 gap-4">

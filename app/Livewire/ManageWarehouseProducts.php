@@ -46,6 +46,46 @@ class ManageWarehouseProducts extends Component
 
     public string $successMessage = '';
 
+    /** Product autocomplete suggestions */
+    public array $productSuggestions = [];
+
+    public function searchProducts(): void
+    {
+        if ($this->editingId) {
+            $this->productSuggestions = [];
+            return;
+        }
+
+        $value = trim($this->product_name);
+
+        if (strlen($value) < 1) {
+            $this->productSuggestions = [];
+            return;
+        }
+
+        $this->productSuggestions = Product::where('name', 'like', "%{$value}%")
+            ->orderBy('name')
+            ->limit(8)
+            ->get(['id', 'name', 'sku', 'unit'])
+            ->toArray();
+    }
+
+    public function clearSuggestions(): void
+    {
+        $this->productSuggestions = [];
+    }
+
+    public function selectProduct(int $productId): void
+    {
+        $product = Product::find($productId);
+        if ($product) {
+            $this->product_name = $product->name;
+            $this->product_sku  = $product->sku;
+            $this->product_unit = $product->unit;
+        }
+        $this->productSuggestions = [];
+    }
+
     protected function rules(): array
     {
         $rules = [
@@ -232,6 +272,7 @@ class ManageWarehouseProducts extends Component
         $this->lead_time = 7;
         $this->safety_stock = 10;
         $this->manual_rop = 0;
+        $this->productSuggestions = [];
         $this->resetValidation();
     }
 
