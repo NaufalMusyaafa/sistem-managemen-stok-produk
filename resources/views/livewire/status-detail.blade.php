@@ -110,7 +110,7 @@
                                             warehouseId: {{ $item->warehouse_id }},
                                             stock: {{ $item->current_stock }},
                                             rop: {{ (int) $rop }},
-                                            procurementUrl: @js(route('procurement.create', $item->id)),
+                                            procurementUrl: @js(route('procurement.create', ['id' => $item->id]) . '?from=' . $type),
                                             warehouseUrl: @js(route('warehouse.detail', $item->warehouse_id))
                                         })"
                                     @endif

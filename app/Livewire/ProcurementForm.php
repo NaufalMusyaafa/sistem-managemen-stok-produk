@@ -30,6 +30,11 @@ class ProcurementForm extends Component
     public string $notes = '';
 
     /**
+     * URL for the back button (determined by the 'from' query param).
+     */
+    public string $backUrl = '';
+
+    /**
      * Flash messages.
      */
     public string $successMessage = '';
@@ -71,6 +76,16 @@ class ProcurementForm extends Component
 
         // Pre-fill order date to today
         $this->order_date = now()->format('Y-m-d');
+
+        // Determine back URL from 'from' query param
+        $from = request()->query('from');
+        if ($from === 'low_stock') {
+            $this->backUrl = route('status.detail', 'low_stock');
+        } elseif ($from === 'total_low') {
+            $this->backUrl = route('status.detail', 'total_low');
+        } else {
+            $this->backUrl = route('warehouse.detail', $this->warehouseProduct->warehouse_id);
+        }
     }
 
     /**

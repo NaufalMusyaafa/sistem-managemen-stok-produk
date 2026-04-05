@@ -4,7 +4,7 @@
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div class="flex items-center gap-4">
                 @if ($warehouseProduct)
-                    <a href="{{ route('warehouse.detail', $warehouseProduct->warehouse->id) }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-teal-600 transition-colors">
+                    <a href="{{ $backUrl }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-teal-600 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
