@@ -14,7 +14,7 @@ class DailyStockInput extends Component
 {
     /**
      * Array of stock inputs keyed by warehouse_product id.
-     * Format: [id => ['current_stock' => int, 'difference' => int, 'rop' => int]]
+     * Format: [id => ['current_stock' => int, 'new_stock' => int|null, 'difference' => int, 'rop' => int]]
      */
     public array $stockInputs = [];
 
@@ -27,12 +27,6 @@ class DailyStockInput extends Component
      * Search filter for product name/SKU.
      */
     public string $search = '';
-
-    /**
-     * Checkbox state per item for confirming unchanged stock.
-     * Format: [warehouse_product_id => true/false]
-     */
-    public array $confirmed = [];
 
     public function mount(): void
     {
@@ -63,8 +57,8 @@ class DailyStockInput extends Component
 
             $this->stockInputs[$item->id] = [
                 'current_stock' => $item->current_stock,
-                'new_stock'     => $item->current_stock,
-                'difference'    => 0,
+                'new_stock'     => null, // Start empty — user must fill in manually
+                'difference'    => null,
                 'rop'           => $rop,
                 'product_name'  => $item->product->name,
                 'product_sku'   => $item->product->sku,
@@ -85,9 +79,14 @@ class DailyStockInput extends Component
         if (count($parts) === 2 && $parts[1] === 'new_stock') {
             $id = $parts[0];
             if (isset($this->stockInputs[$id])) {
-                $newStock = (int) ($this->stockInputs[$id]['new_stock'] ?? 0);
-                $oldStock = (int) ($this->stockInputs[$id]['current_stock'] ?? 0);
-                $this->stockInputs[$id]['difference'] = $newStock - $oldStock;
+                $rawValue = $this->stockInputs[$id]['new_stock'];
+                if ($rawValue === null || $rawValue === '') {
+                    $this->stockInputs[$id]['difference'] = null;
+                } else {
+                    $newStock = (int) $rawValue;
+                    $oldStock = (int) ($this->stockInputs[$id]['current_stock'] ?? 0);
+                    $this->stockInputs[$id]['difference'] = $newStock - $oldStock;
+                }
             }
         }
     }
@@ -103,54 +102,48 @@ class DailyStockInput extends Component
 
         DB::transaction(function () use ($user, $inventoryService, &$updatedCount) {
             foreach ($this->stockInputs as $id => $input) {
-                $newStock = (int) ($input['new_stock'] ?? 0);
-                $oldStock = (int) ($input['current_stock'] ?? 0);
-                $isConfirmed = !empty($this->confirmed[$id]);
-
-                // Skip if no change AND not confirmed
-                if ($newStock === $oldStock && !$isConfirmed) {
+                // Skip items where user left the input empty
+                if ($input['new_stock'] === null || $input['new_stock'] === '') {
                     continue;
                 }
+
+                $newStock = (int) $input['new_stock'];
+                $oldStock = (int) ($input['current_stock'] ?? 0);
 
                 $warehouseProduct = WarehouseProduct::withoutGlobalScopes()->find($id);
                 if (! $warehouseProduct) {
                     continue;
                 }
 
-                // Only update stock & status if there's an actual change
-                if ($newStock !== $oldStock) {
-                    // Check if there's an active procurement (on_order)
-                    $activeProcurements = $warehouseProduct->procurements()
-                        ->whereIn('status', ['pending', 'approved', 'ordered'])
-                        ->get();
-                    $isOrdered = $activeProcurements->isNotEmpty();
+                // Always update stock & status when user fills in a value
+                $activeProcurements = $warehouseProduct->procurements()
+                    ->where('status', 'ordered')
+                    ->get();
+                $isOrdered = $activeProcurements->isNotEmpty();
 
-                    // Calculate new status
-                    $rop = $inventoryService->calculateROP(
-                        (float) $warehouseProduct->avg_daily_usage,
-                        (int) $warehouseProduct->lead_time,
-                        (int) $warehouseProduct->safety_stock
-                    );
+                $rop = $inventoryService->calculateROP(
+                    (float) $warehouseProduct->avg_daily_usage,
+                    (int) $warehouseProduct->lead_time,
+                    (int) $warehouseProduct->safety_stock
+                );
 
-                    // Auto-complete procurement if stock rises above ROP
-                    if ($isOrdered && $newStock > $rop) {
-                        foreach ($activeProcurements as $procurement) {
-                            $procurement->update(['status' => 'received']);
-                        }
-                        $isOrdered = false;
+                // Auto-complete procurement if stock rises above ROP
+                if ($isOrdered && $newStock > $rop) {
+                    foreach ($activeProcurements as $procurement) {
+                        $procurement->update(['status' => 'received']);
                     }
-
-                    $newStatus = $inventoryService->checkStatus($newStock, $rop, $isOrdered);
-
-                    // Update warehouse product
-                    $warehouseProduct->update([
-                        'current_stock' => $newStock,
-                        'status'        => $newStatus,
-                        'reorder_point' => $rop,
-                    ]);
+                    $isOrdered = false;
                 }
 
-                // Create stock history record (for both changed and confirmed items)
+                $newStatus = $inventoryService->checkStatus($newStock, $rop, $isOrdered);
+
+                $warehouseProduct->update([
+                    'current_stock' => $newStock,
+                    'status'        => $newStatus,
+                    'reorder_point' => $rop,
+                ]);
+
+                // Always create stock history record
                 StockHistory::create([
                     'warehouse_product_id' => $id,
                     'user_id'              => $user->id,
@@ -159,21 +152,19 @@ class DailyStockInput extends Component
                     'difference'           => $newStock - $oldStock,
                 ]);
 
-                // Update local state
+                // Reset input to empty after save
                 $this->stockInputs[$id]['current_stock'] = $newStock;
-                $this->stockInputs[$id]['difference'] = 0;
-                $this->stockInputs[$id]['last_updated'] = now()->format('Y-m-d');
+                $this->stockInputs[$id]['new_stock']     = null;
+                $this->stockInputs[$id]['difference']    = null;
+                $this->stockInputs[$id]['last_updated']  = now()->format('Y-m-d');
 
                 $updatedCount++;
             }
         });
 
-        // Reset all checkboxes
-        $this->confirmed = [];
-
         $this->successMessage = $updatedCount > 0
             ? "Berhasil menyimpan {$updatedCount} item."
-            : "Tidak ada perubahan stok atau konfirmasi untuk disimpan.";
+            : "Tidak ada item yang diisi. Isi kolom Stok Sekarang untuk menyimpan.";
 
         $this->dispatch('stock-saved');
     }

@@ -87,9 +87,6 @@
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Terakhir Update</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4 w-44">Stok Sekarang</th>
                                 <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-4">Selisih</th>
-                                <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-4 w-12">
-                                    <span title="Konfirmasi stok tetap">✓</span>
-                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -97,10 +94,12 @@
                             @forelse ($filteredItems as $id => $item)
                                 @php
                                     $rowNum++;
-                                    $newStock = (int) ($item['new_stock'] ?? 0);
-                                    $rop = (int) ($item['rop'] ?? 0);
-                                    $diff = (int) ($item['difference'] ?? 0);
-                                    $isBelowRop = $newStock < $rop && $newStock !== $item['current_stock'];
+                                    $newStockRaw = $item['new_stock'];
+                                    $hasValue    = $newStockRaw !== null && $newStockRaw !== '';
+                                    $newStock    = $hasValue ? (int) $newStockRaw : (int) $item['current_stock'];
+                                    $rop         = (int) ($item['rop'] ?? 0);
+                                    $diff        = $item['difference'];
+                                    $isBelowRop  = $hasValue && $newStock < $rop;
                                 @endphp
                                 <tr class="hover:bg-gray-50/50 transition-colors" wire:key="row-{{ $id }}">
                                     {{-- Row Number --}}
@@ -159,6 +158,7 @@
                                             type="number"
                                             wire:model.live.debounce.500ms="stockInputs.{{ $id }}.new_stock"
                                             min="0"
+                                            placeholder="—"
                                             class="w-32 mx-auto text-center text-sm font-semibold rounded-lg border-2 px-3 py-2.5 transition-all focus:ring-2 focus:ring-offset-1
                                                 {{ $isBelowRop
                                                     ? 'border-red-400 bg-red-50 text-red-700 focus:ring-red-500/30 focus:border-red-500'
@@ -177,7 +177,7 @@
 
                                     {{-- Difference --}}
                                     <td class="px-6 py-4 text-center">
-                                        @if ($diff !== 0)
+                                        @if ($diff !== null && $diff !== 0)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg
                                                 {{ $diff > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50' : 'bg-red-50 text-red-700 border border-red-200/50' }}
                                             ">
@@ -194,26 +194,11 @@
                                         @endif
                                     </td>
 
-                                    {{-- Confirm Checkbox --}}
-                                    <td class="px-4 py-4 text-center">
-                                        @php
-                                            $alreadyUpdatedToday = isset($item['last_updated']) && $item['last_updated'] === now()->format('Y-m-d');
-                                        @endphp
-                                        @if ($alreadyUpdatedToday)
-                                            <span class="text-emerald-500" title="Sudah diupdate hari ini">✓</span>
-                                        @else
-                                            <input
-                                                type="checkbox"
-                                                wire:model.live="confirmed.{{ $id }}"
-                                                class="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500/30 cursor-pointer"
-                                                title="Centang untuk konfirmasi stok tetap"
-                                            />
-                                        @endif
-                                    </td>
+
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="px-6 py-16 text-center">
+                                    <td colspan="8" class="px-6 py-16 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
                                                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,6 +218,7 @@
                 <div class="bg-gray-50 border-t border-gray-100 px-6 py-3">
                     <p class="text-xs text-gray-400">
                         Menampilkan <span class="font-semibold text-gray-600">{{ count($filteredItems) }}</span> produk
+                        · Isi kolom <span class="font-semibold text-gray-600">Stok Sekarang</span> lalu klik Simpan — item yang dikosongkan tidak akan diupdate
                         · Input yang <span class="text-red-500 font-semibold">merah</span> menandakan stok di bawah Reorder Point (ROP)
                     </p>
                 </div>
