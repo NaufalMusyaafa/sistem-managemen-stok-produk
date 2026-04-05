@@ -70,10 +70,10 @@ Route::middleware('auth')->group(function () {
         ->name('manage.orders');
 
     // ──────────────────────────────────────────────
-    // Manager (new) — Status Detail Pages
+    // Manager, Admin UID, Rent — Status Detail Pages
     // ──────────────────────────────────────────────
     Route::get('/status/{type}', StatusDetail::class)
-        ->middleware('role:manager')
+        ->middleware('role:manager,admin_uid,rent')
         ->name('status.detail');
 
     // ──────────────────────────────────────────────

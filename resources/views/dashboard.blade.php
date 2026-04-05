@@ -35,76 +35,82 @@
                 $normalCount = $allWarehouseProducts->where('status', 'normal')->count();
                 $lowStockCount = $allWarehouseProducts->where('status', 'low_stock')->count();
                 $onOrderCount = $allWarehouseProducts->where('status', 'on_order')->count();
+                $totalLowCount = $lowStockCount + $onOrderCount;
                 $totalPivots = $allWarehouseProducts->count();
+                $isRent = Auth::user()->role === 'rent';
             @endphp
 
-            {{-- Summary Stats --}}
+            {{-- Summary Stats — Clickable Cards (same as Manager) --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {{-- Total Warehouses --}}
-                <div class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Total Gudang</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-1">{{ $warehouses->count() }}</p>
-                        </div>
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
 
-                {{-- Normal Stock --}}
-                <div class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-md transition-shadow">
+                {{-- Stok Normal --}}
+                <a href="{{ route('status.detail', 'normal') }}" class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-lg hover:border-emerald-200 transition-all group cursor-pointer">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Stok Normal</p>
                             <p class="text-3xl font-bold text-emerald-600 mt-1">{{ $normalCount }}</p>
                             <p class="text-xs text-gray-400 mt-1">dari {{ $totalPivots }} item</p>
                         </div>
-                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl flex items-center justify-center">
+                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                {{-- Low Stock --}}
-                <div class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-md transition-shadow">
+                {{-- Stok Rendah --}}
+                <a href="{{ route('status.detail', 'low_stock') }}" class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-lg hover:border-red-200 transition-all group cursor-pointer">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Stok Rendah</p>
                             <p class="text-3xl font-bold text-red-600 mt-1">{{ $lowStockCount }}</p>
-                            <p class="text-xs text-gray-400 mt-1">perlu perhatian</p>
+                            <p class="text-xs text-gray-400 mt-1">belum dipesan</p>
                         </div>
-                        <div class="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 rounded-xl flex items-center justify-center">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                {{-- On Order --}}
-                <div class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-md transition-shadow">
+                {{-- Dalam Pesanan --}}
+                <a href="{{ route('status.detail', 'on_order') }}" class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-lg hover:border-blue-200 transition-all group cursor-pointer">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Dalam Pesanan</p>
                             <p class="text-3xl font-bold text-blue-600 mt-1">{{ $onOrderCount }}</p>
                             <p class="text-xs text-gray-400 mt-1">menunggu pengiriman</p>
                         </div>
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
-                </div>
+                </a>
+
+                {{-- Total Stok Rendah --}}
+                <a href="{{ route('status.detail', 'total_low') }}" class="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 hover:shadow-lg hover:border-orange-200 transition-all group cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Total Stok Rendah</p>
+                            <p class="text-3xl font-bold text-orange-600 mt-1">{{ $totalLowCount }}</p>
+                            <p class="text-xs text-gray-400 mt-1">rendah + dalam pesanan</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
             </div>
 
             {{-- Warehouse Table --}}
+
             <div class="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">

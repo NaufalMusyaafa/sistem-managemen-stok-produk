@@ -14,6 +14,7 @@ class StatusDetail extends Component
     public string $type = '';
     public string $search = '';
     public string $filterWarehouse = '';
+    public bool $isRent = false;
 
     public function mount(string $type): void
     {
@@ -21,6 +22,7 @@ class StatusDetail extends Component
             abort(404);
         }
         $this->type = $type;
+        $this->isRent = auth()->user()?->role === 'rent';
     }
 
     public function updatingSearch(): void
@@ -77,11 +79,14 @@ class StatusDetail extends Component
         $items = $query->orderBy('updated_at', 'desc')->paginate(15);
         $warehouses = Warehouse::orderBy('name')->get();
 
+        $showOrderBtn = $this->isRent && in_array($this->type, ['low_stock', 'total_low']);
+
         return view('livewire.status-detail', [
-            'items'      => $items,
-            'warehouses' => $warehouses,
-            'title'      => $this->getTitle(),
-            'isTotalLow' => $this->type === 'total_low',
+            'items'         => $items,
+            'warehouses'    => $warehouses,
+            'title'         => $this->getTitle(),
+            'isTotalLow'    => $this->type === 'total_low',
+            'showOrderBtn'  => $showOrderBtn,
         ])->layout('layouts.app');
     }
 }
