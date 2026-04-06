@@ -149,15 +149,23 @@ Akses aplikasi di: **http://127.0.0.1:8000**
 
 ## 👥 Akun Demo
 
-Seeder membuat 3 akun demo (setelah migration, role `manager` di-rename ke `rent`):
+Seeder membuat 13 akun demo:
 
 | Email | Password | Role | Akses |
 |---|---|---|---|
 | `admin.uid@test.com` | `password` | Admin UID | Dashboard + CRUD management semua data |
-| `admin.medan@test.com` | `password` | Admin UP3 | Input stok harian (gudang sendiri) |
-| `manager@test.com` | `password` | Rent | Dashboard + form pengadaan + daftar pesanan |
-
-> **Catatan:** Untuk menguji role **Manager** (monitoring), buat user baru dengan role `manager` melalui halaman Kelola User.
+| `admin.manager@test.com` | `password` | Manager | Dashboard + form pengadaan + daftar pesanan |
+| `admin.rent@test.com` | `password` | Rent | Dashboard + form pengadaan + daftar pesanan || `admin.medan@test.com` | `password` | Admin UP3 | Input stok harian (gudang sendiri) |
+| `admin.medan@test.com` | `password` | Admin UP3 | Input stok harian (gudang Medan) |
+| `admin.binjai@test.com` | `password` | Admin UP3 | Input stok harian (gudang Binjai) |
+| `admin.lubukpakam@test.com` | `password` | Admin UP3 | Input stok harian (gudang Lubuk Pakam) |
+| `admin.bukitbarisan@test.com` | `password` | Admin UP3 | Input stok harian (gudang Bukit Barisan) |
+| `admin.medanutara@test.com` | `password` | Admin UP3 | Input stok harian (gudang Medan Utara) |
+| `admin.nias@test.com` | `password` | Admin UP3 | Input stok harian (gudang Nias) |
+| `admin.padangsidimpuan@test.com` | `password` | Admin UP3 | Input stok harian (gudang Padangsidimpuan) |
+| `admin.pematangsiantar@test.com` | `password` | Admin UP3 | Input stok harian (gudang Pematangsiantar) |
+| `admin.rantauprapat@test.com` | `password` | Admin UP3 | Input stok harian (gudang Rantauprapat) |
+| `admin.sibolga@test.com` | `password` | Admin UP3 | Input stok harian (gudang Sibolga) |
 
 ---
 

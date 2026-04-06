@@ -136,6 +136,78 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
+            'name'         => 'Admin UP3 Binjai',
+            'email'        => 'admin.binjai@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Binjai')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Lubuk Pakam',
+            'email'        => 'admin.lubukpakam@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Lubuk Pakam')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Bukit Barisan',
+            'email'        => 'admin.bukitbarisan@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Bukit Barisan')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Medan Utara',
+            'email'        => 'admin.medanutara@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Medan Utara')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Nias',
+            'email'        => 'admin.nias@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Nias')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Padangsidimpuan',
+            'email'        => 'admin.padangsidimpuan@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Padangsidimpuan')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Pematang Siantar',
+            'email'        => 'admin.pematangsiantar@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Pematang Siantar')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Rantau Prapat',
+            'email'        => 'admin.rantauprapat@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Rantau Prapat')->id,
+        ]);
+
+        User::create([
+            'name'         => 'Admin UP3 Sibolga',
+            'email'        => 'admin.sibolga@test.com',
+            'password'     => $defaultPassword,
+            'role'         => 'admin_up3',
+            'warehouse_id' => $warehouses->firstWhere('name', 'Gudang UP3 Sibolga')->id,
+        ]);
+
+        User::create([
             'name'         => 'Admin UID',
             'email'        => 'admin.uid@test.com',
             'password'     => $defaultPassword,
@@ -144,22 +216,22 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
-            'name'         => 'Manager',
-            'email'        => 'manager@test.com',
+            'name'         => 'Admin Manager',
+            'email'        => 'admin.manager@test.com',
             'password'     => $defaultPassword,
             'role'         => 'manager',
             'warehouse_id' => null,
         ]);
 
         User::create([
-            'name'         => 'Manager Notifikasi',
-            'email'        => '',
+            'name'         => 'Admin Rent',
+            'email'        => 'admin.rent@test.com',
             'password'     => $defaultPassword,
-            'role'         => 'manager',
+            'role'         => 'rent',
             'warehouse_id' => null,
         ]);
 
-        $this->command->info('✔ 4 Users created (password: "password").');
+        $this->command->info('✔ 13 Users created (password: "password").');
 
         // ──────────────────────────────────────────────
         // 4. PIVOT SEEDING — warehouse_products (10 per warehouse)
@@ -235,7 +307,7 @@ class DatabaseSeeder extends Seeder
             [
                 ['Warehouses', $warehouses->count()],
                 ['Products', $products->count()],
-                ['Users', 4],
+                ['Users', 13],
                 ['Warehouse-Product Pivots', $totalPivots],
             ]
         );
