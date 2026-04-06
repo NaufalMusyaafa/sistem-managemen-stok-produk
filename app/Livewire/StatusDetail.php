@@ -48,32 +48,37 @@ class StatusDetail extends Component
 
     public function render()
     {
+        // Capture to local vars so closures work correctly
+        $type            = $this->type;
+        $search          = trim($this->search);
+        $filterWarehouse = $this->filterWarehouse;
+
         $query = WarehouseProduct::withoutGlobalScopes()
             ->with(['product', 'warehouse']);
 
         // Filter by status type
-        if ($this->type === 'total_low') {
+        if ($type === 'total_low') {
             $query->whereIn('status', ['low_stock', 'on_order']);
         } else {
-            $query->where('status', $this->type);
+            $query->where('status', $type);
         }
 
-        // Search by product name or SKU
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->whereHas('product', function ($pq) {
-                    $pq->where('name', 'like', "%{$this->search}%")
-                       ->orWhere('sku', 'like', "%{$this->search}%");
+        // Search by product name, SKU, or warehouse name
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('product', function ($pq) use ($search) {
+                    $pq->where('name', 'like', "%{$search}%")
+                       ->orWhere('sku', 'like', "%{$search}%");
                 })
-                ->orWhereHas('warehouse', function ($wq) {
-                    $wq->where('name', 'like', "%{$this->search}%");
+                ->orWhereHas('warehouse', function ($wq) use ($search) {
+                    $wq->where('name', 'like', "%{$search}%");
                 });
             });
         }
 
         // Filter by warehouse
-        if ($this->filterWarehouse) {
-            $query->where('warehouse_id', $this->filterWarehouse);
+        if ($filterWarehouse !== '') {
+            $query->where('warehouse_id', (int) $filterWarehouse);
         }
 
         $items = $query->orderBy('updated_at', 'desc')->paginate(15);
