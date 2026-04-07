@@ -1,4 +1,18 @@
-<div>
+<div
+    x-data="{
+        showModal: false,
+        selectedItem: null,
+        openModal(item) {
+            this.selectedItem = item;
+            this.showModal = true;
+        },
+        closeModal() {
+            this.showModal = false;
+            this.selectedItem = null;
+        }
+    }"
+    @keydown.escape.window="closeModal()"
+>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -167,31 +181,16 @@
     {{-- Item Action Modal (Rent only, low_stock items)               --}}
     {{-- ============================================================ --}}
     <div
-        x-data="{
-            showModal: false,
-            selectedItem: null,
-            openModal(item) {
-                this.selectedItem = item;
-                this.showModal = true;
-            },
-            closeModal() {
-                this.showModal = false;
-                this.selectedItem = null;
-            }
-        }"
-        @keydown.escape.window="closeModal()"
+        x-show="showModal"
+        x-transition:enter="ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-50 overflow-y-auto"
+        style="display: none;"
     >
-        <div
-            x-show="showModal"
-            x-transition:enter="ease-out duration-200"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="ease-in duration-150"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-50 overflow-y-auto"
-            style="display: none;"
-        >
         {{-- Backdrop --}}
         <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" @click="closeModal()"></div>
 
