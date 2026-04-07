@@ -351,7 +351,7 @@ sistem-managemen-stok-produk/
 ├── database/
 │   ├── migrations/                    # 6 tabel utama + default Laravel
 │   └── seeders/
-│       └── DatabaseSeeder.php         # 10 gudang, 50 produk, 3 user, 500 pivot
+│       └── DatabaseSeeder.php         # 10 gudang
 ├── resources/views/
 │   ├── dashboard.blade.php            # Dashboard monitoring (Admin UID & Rent)
 │   ├── dashboard-manager.blade.php    # Dashboard monitoring (Manager — stat cards interaktif)
@@ -461,11 +461,10 @@ Seeder mengisi database dengan data realistis:
 | Data | Jumlah | Keterangan |
 |---|---|---|
 | Gudang | 10 | UP3 di Sumatera Utara (Medan, Binjai, P. Siantar, dll.) |
-| Produk | 50 | Peralatan kelistrikan (kabel, trafo, meter, arrester, dll.) |
-| User | 3 | 1 Admin UID, 1 Admin UP3, 1 Rent (sebelumnya Manager) |
-| Stok (pivot) | 500 | 50 produk × 10 gudang |
+| Produk | 10 | Peralatan kelistrikan (kabel, trafo, meter, arrester, dll.) |
+| User | 13 | 1 Admin UID, 10 Admin UP3, 1 Rent, dan 1 Manager |
+| Stok | 100 | 10 produk × 10 gudang |
 | Distribusi status | 70/20/10 | ~70% normal, ~20% low_stock, ~10% on_order |
-
 ---
 
 ## 📄 Lisensi
