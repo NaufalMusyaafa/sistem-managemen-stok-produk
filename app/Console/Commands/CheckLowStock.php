@@ -47,35 +47,23 @@ class CheckLowStock extends Command
                 continue;
             }
 
+            // Always mark as expired when ETA passes — receipt must be done manually by Rent
+            $procurement->update(['status' => 'expired']);
+
+            // Re-evaluate warehouse product status
             $rop = $inventoryService->calculateROP(
                 (float) $wp->avg_daily_usage,
                 (int) $wp->lead_time,
                 (int) $wp->safety_stock
             );
 
-            if ($wp->current_stock > $rop) {
-                // Stock is fine — mark as received
-                $procurement->update(['status' => 'received']);
+            $otherActive = Procurement::where('warehouse_product_id', $wp->id)
+                ->whereIn('status', ['pending', 'approved', 'ordered'])
+                ->where('id', '!=', $procurement->id)
+                ->exists();
 
-                // Check if there are other active procurements
-                $otherActive = Procurement::where('warehouse_product_id', $wp->id)
-                    ->whereIn('status', ['pending', 'approved', 'ordered'])
-                    ->where('id', '!=', $procurement->id)
-                    ->exists();
+            $wp->update(['status' => $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive)]);
 
-                $wp->update(['status' => $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive)]);
-            } else {
-                // Stock still low — mark procurement as expired, item back to low_stock
-                $procurement->update(['status' => 'expired']);
-
-                // Check if there are other active procurements
-                $otherActive = Procurement::where('warehouse_product_id', $wp->id)
-                    ->whereIn('status', ['pending', 'approved', 'ordered'])
-                    ->where('id', '!=', $procurement->id)
-                    ->exists();
-
-                $wp->update(['status' => $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive)]);
-            }
             $expiredCount++;
         }
 

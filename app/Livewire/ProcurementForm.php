@@ -25,6 +25,7 @@ class ProcurementForm extends Component
      */
     public string $vendor_name = '';
     public string $vendor_contact = '';
+    public int $ordered_quantity = 1;
     public string $order_date = '';
     public string $eta_date = '';
     public string $notes = '';
@@ -46,11 +47,12 @@ class ProcurementForm extends Component
     protected function rules(): array
     {
         return [
-            'vendor_name'    => 'required|string|max:255',
-            'vendor_contact' => 'nullable|string|max:255',
-            'order_date'     => 'required|date|after_or_equal:today',
-            'eta_date'       => 'nullable|date|after_or_equal:order_date',
-            'notes'          => 'nullable|string|max:1000',
+            'vendor_name'      => 'required|string|max:255',
+            'vendor_contact'   => 'nullable|string|max:255',
+            'ordered_quantity' => 'required|integer|min:1',
+            'order_date'       => 'required|date|after_or_equal:today',
+            'eta_date'         => 'nullable|date|after_or_equal:order_date',
+            'notes'            => 'nullable|string|max:1000',
         ];
     }
 
@@ -60,10 +62,12 @@ class ProcurementForm extends Component
     protected function messages(): array
     {
         return [
-            'vendor_name.required'      => 'Nama vendor wajib diisi.',
-            'order_date.required'       => 'Tanggal order wajib diisi.',
-            'order_date.after_or_equal' => 'Tanggal order tidak boleh sebelum hari ini.',
-            'eta_date.after_or_equal'   => 'Estimasi tiba harus setelah atau sama dengan tanggal order.',
+            'vendor_name.required'       => 'Nama vendor wajib diisi.',
+            'ordered_quantity.required'  => 'Jumlah pesanan wajib diisi.',
+            'ordered_quantity.min'       => 'Jumlah pesanan minimal 1.',
+            'order_date.required'        => 'Tanggal order wajib diisi.',
+            'order_date.after_or_equal'  => 'Tanggal order tidak boleh sebelum hari ini.',
+            'eta_date.after_or_equal'    => 'Estimasi tiba harus setelah atau sama dengan tanggal order.',
         ];
     }
 
@@ -105,6 +109,7 @@ class ProcurementForm extends Component
                 'user_id'              => Auth::id(),
                 'vendor_name'          => $this->vendor_name,
                 'vendor_contact'       => $this->vendor_contact ?: null,
+                'ordered_quantity'     => $this->ordered_quantity,
                 'order_date'           => $this->order_date,
                 'eta_date'             => $this->eta_date ?: null,
                 'status'               => 'ordered',

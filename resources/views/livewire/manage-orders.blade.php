@@ -260,6 +260,10 @@
                                 @endif
                             </div>
                             <div>
+                                <p class="text-xs text-gray-500 font-medium mb-1">Jumlah Dipesan</p>
+                                <p class="font-bold text-indigo-700">{{ number_format($selectedOrder->ordered_quantity) }} {{ $selectedOrder->warehouseProduct->product->unit ?? 'unit' }}</p>
+                            </div>
+                            <div>
                                 <p class="text-xs text-gray-500 font-medium mb-1">Dipesan oleh</p>
                                 <p class="text-gray-700">{{ $selectedOrder->user->name ?? '-' }}</p>
                             </div>
@@ -309,15 +313,61 @@
                             Batalkan Pesanan
                         </button>
                         <button
-                            wire:click="markReceived({{ $selectedOrder->id }})"
-                            wire:confirm="Konfirmasi bahwa barang telah diterima?"
+                            wire:click="confirmReceive({{ $selectedOrder->id }})"
                             class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Tandai Diterima
+                            <span wire:loading.remove wire:target="confirmReceive({{ $selectedOrder->id }})">Tandai Diterima</span>
+                            <span wire:loading wire:target="confirmReceive({{ $selectedOrder->id }})">Memproses...</span>
                         </button>
                     </div>
                 @endif
+            </div>
+        </div>
+    @endif
+
+    {{-- Stock Confirmation Modal --}}
+    @if ($showStockConfirm)
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4 z-10">
+                {{-- Back button --}}
+                <button
+                    wire:click="$set('showStockConfirm', false)"
+                    class="absolute top-4 left-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Kembali"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                </button>
+                <div class="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-full mx-auto">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-base font-bold text-gray-900">Stok Sudah di Atas ROP</h3>
+                    <p class="text-sm text-gray-500 mt-1.5">
+                        Stok item ini sudah di atas ROP. Apakah Anda tetap ingin menambahkan
+                        <strong class="text-indigo-700">{{ $selectedOrder?->ordered_quantity ?? 0 }} {{ $selectedOrder?->warehouseProduct?->product?->unit ?? 'unit' }}</strong>
+                        ke stok gudang?
+                    </p>
+                </div>
+                <div class="flex gap-3 pt-1">
+                    <button
+                        wire:click="receiveWithStockChoice(false)"
+                        class="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                    >
+                        Tidak, Terima Saja
+                    </button>
+                    <button
+                        wire:click="receiveWithStockChoice(true)"
+                        class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm"
+                    >
+                        Ya, Tambah Stok
+                    </button>
+                </div>
             </div>
         </div>
     @endif

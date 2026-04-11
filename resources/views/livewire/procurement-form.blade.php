@@ -132,6 +132,26 @@
                         @enderror
                     </div>
 
+                    {{-- Ordered Quantity --}}
+                    <div>
+                        <label for="ordered_quantity" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Jumlah yang Dipesan <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            id="ordered_quantity"
+                            wire:model="ordered_quantity"
+                            min="1"
+                            class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+                        />
+                        @if ($warehouseProduct)
+                            <p class="text-xs text-gray-400 mt-1">Satuan: {{ $warehouseProduct->product->unit }}</p>
+                        @endif
+                        @error('ordered_quantity')
+                            <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     {{-- Order Date --}}
                     <div>
                         <label for="order_date" class="block text-sm font-medium text-gray-700 mb-1.5">

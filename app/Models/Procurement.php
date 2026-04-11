@@ -17,6 +17,7 @@ class Procurement extends Model
         'user_id',
         'vendor_name',
         'vendor_contact',
+        'ordered_quantity',
         'order_date',
         'eta_date',
         'status',

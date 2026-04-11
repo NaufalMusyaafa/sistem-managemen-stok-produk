@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Procurement;
+use App\Models\StockHistory;
 use App\Services\InventoryService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -21,6 +22,10 @@ class ManageOrders extends Component
     public ?int $selectedOrderId = null;
     public ?Procurement $selectedOrder = null;
     public string $newEtaDate = '';
+
+    // Confirmation dialog for above-ROP receipt
+    public bool $showStockConfirm = false;
+    public ?int $pendingReceiveId = null;
 
     public function updatingSearch(): void
     {
@@ -55,6 +60,8 @@ class ManageOrders extends Component
         $this->selectedOrder = null;
         $this->newEtaDate = '';
         $this->successMessage = '';
+        $this->showStockConfirm = false;
+        $this->pendingReceiveId = null;
     }
 
     /**
@@ -82,29 +89,82 @@ class ManageOrders extends Component
     }
 
     /**
-     * Mark a procurement as received.
-     * User can mark as received at any time while status is still 'ordered'.
-     * Also updates the warehouse_product status accordingly.
+     * Initiate the "mark received" flow.
+     * If stock is already above ROP, show confirmation dialog first.
+     * If stock is still below ROP, mark received immediately and add stock.
      */
-    public function markReceived(int $id): void
+    public function confirmReceive(int $id): void
     {
-        $procurement = Procurement::with('warehouseProduct')->findOrFail($id);
-
         $user = Auth::user();
         if (! in_array($user->role, ['rent', 'admin_uid'])) {
             abort(403);
         }
+
+        $procurement = Procurement::with('warehouseProduct')->findOrFail($id);
 
         if ($procurement->status !== 'ordered') {
             $this->successMessage = 'Pesanan ini tidak dapat ditandai sebagai diterima.';
             return;
         }
 
+        $wp = $procurement->warehouseProduct;
+        $inventoryService = app(InventoryService::class);
+        $rop = $inventoryService->calculateROP(
+            (float) $wp->avg_daily_usage,
+            (int) $wp->lead_time,
+            (int) $wp->safety_stock
+        );
+
+        if ($wp->current_stock > $rop) {
+            // Stock already above ROP — ask user whether to add stock anyway
+            $this->pendingReceiveId = $id;
+            $this->showStockConfirm = true;
+        } else {
+            // Stock still below ROP — directly receive and add stock
+            $this->doMarkReceived($id, addStock: true);
+        }
+    }
+
+    /**
+     * Called after confirmation dialog: user chooses whether to add stock.
+     */
+    public function receiveWithStockChoice(bool $addStock): void
+    {
+        $this->showStockConfirm = false;
+        if ($this->pendingReceiveId) {
+            $this->doMarkReceived($this->pendingReceiveId, $addStock);
+        }
+        $this->pendingReceiveId = null;
+    }
+
+    /**
+     * Core logic: mark procurement as received, optionally add ordered_quantity to stock.
+     */
+    private function doMarkReceived(int $id, bool $addStock): void
+    {
+        $procurement = Procurement::with('warehouseProduct')->findOrFail($id);
         $procurement->update(['status' => 'received']);
 
-        // Update warehouse product status
         $wp = $procurement->warehouseProduct;
         if ($wp) {
+            if ($addStock && $procurement->ordered_quantity > 0) {
+                $previousStock = $wp->current_stock;
+                $newStock = $previousStock + $procurement->ordered_quantity;
+
+                $wp->current_stock = $newStock;
+                $wp->save();
+
+                // Record stock history
+                StockHistory::create([
+                    'warehouse_product_id' => $wp->id,
+                    'user_id'              => Auth::id(),
+                    'previous_stock'       => $previousStock,
+                    'current_stock'        => $newStock,
+                    'difference'           => $procurement->ordered_quantity,
+                ]);
+            }
+
+            // Re-evaluate status based on current (possibly updated) stock
             $inventoryService = app(InventoryService::class);
             $rop = $inventoryService->calculateROP(
                 (float) $wp->avg_daily_usage,
@@ -112,14 +172,12 @@ class ManageOrders extends Component
                 (int) $wp->safety_stock
             );
 
-            // Check if there are OTHER active (ordered) procurements for this item
             $otherActive = Procurement::where('warehouse_product_id', $wp->id)
                 ->where('status', 'ordered')
                 ->where('id', '!=', $id)
                 ->exists();
 
-            $newStatus = $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive);
-            $wp->update(['status' => $newStatus]);
+            $wp->update(['status' => $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive)]);
         }
 
         // Refresh detail panel if open
@@ -131,7 +189,9 @@ class ManageOrders extends Component
             ]);
         }
 
-        $this->successMessage = 'Pesanan ditandai sebagai diterima.';
+        $this->successMessage = $addStock
+            ? "Pesanan diterima. Stok ditambah {$procurement->ordered_quantity} unit."
+            : 'Pesanan ditandai sebagai diterima (stok tidak berubah).';
     }
 
     /**
@@ -188,17 +248,18 @@ class ManageOrders extends Component
     public function render()
     {
         $user = Auth::user();
+        $search = $this->search;
 
         $query = Procurement::with(['warehouseProduct.product', 'warehouseProduct.warehouse', 'user'])
             ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
-            ->when($this->search, function ($q) {
-                $q->where(function ($q2) {
-                    $q2->where('vendor_name', 'like', "%{$this->search}%")
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('vendor_name', 'like', "%{$search}%")
                        ->orWhereHas('warehouseProduct.product', fn ($pq) =>
-                           $pq->where('name', 'like', "%{$this->search}%")
+                           $pq->where('name', 'like', "%{$search}%")
                        )
                        ->orWhereHas('warehouseProduct.warehouse', fn ($wq) =>
-                           $wq->where('name', 'like', "%{$this->search}%")
+                           $wq->where('name', 'like', "%{$search}%")
                        );
                 });
             });

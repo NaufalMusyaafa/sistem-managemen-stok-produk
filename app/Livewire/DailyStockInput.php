@@ -127,14 +127,6 @@ class DailyStockInput extends Component
                     (int) $warehouseProduct->safety_stock
                 );
 
-                // Auto-complete procurement if stock rises above ROP
-                if ($isOrdered && $newStock > $rop) {
-                    foreach ($activeProcurements as $procurement) {
-                        $procurement->update(['status' => 'received']);
-                    }
-                    $isOrdered = false;
-                }
-
                 $newStatus = $inventoryService->checkStatus($newStock, $rop, $isOrdered);
 
                 $warehouseProduct->update([
