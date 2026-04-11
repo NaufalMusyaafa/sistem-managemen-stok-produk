@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
     // Export Excel
     // ──────────────────────────────────────────────
     Route::get('/export/all-warehouses', [ExportController::class, 'exportAll'])
-        ->middleware('role:manager,admin_uid')
+        ->middleware('role:manager,admin_uid,rent')
         ->name('export.all');
 
     Route::get('/export/warehouse/{id}', [ExportController::class, 'exportWarehouse'])
