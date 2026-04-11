@@ -20,6 +20,7 @@ Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris prod
 | **Audit Trail** | Setiap perubahan stok tercatat di `stock_histories` |
 | **Warehouse Scope** | Admin UP3 otomatis hanya melihat data gudangnya sendiri |
 | **Pagination** | Semua tabel data menggunakan pagination 10 item/halaman |
+| **Ekspor Excel (.xlsx)** | Export stok gudang ke file Excel berformat rapi. Tombol di Dashboard (ekspor semua gudang, sheet terpisah per gudang) dan di halaman Detail Gudang (ekspor per gudang) |
 
 ---
 
@@ -34,6 +35,7 @@ Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris prod
 | MySQL | 8.0+ |
 | Tailwind CSS | 4.x (via Vite) |
 | Node.js | 22.x |
+| PhpSpreadsheet | 5.x |
 
 ---
 
@@ -46,6 +48,8 @@ Pastikan sudah terinstall:
 - **MySQL** ≥ 8.0
 - **Node.js** ≥ 18.x & npm ≥ 9.x
 - **Git**
+
+> **Catatan:** Library `phpoffice/phpspreadsheet` sudah disertakan di `composer.json` dan akan terinstall otomatis saat `composer install`. Tidak diperlukan ekstensi PHP tambahan selain yang tercantum di atas.
 
 ---
 
@@ -198,6 +202,8 @@ Seeder membuat 13 akun demo:
 - ✅ Halaman detail: tabel dengan search bar, filter gudang, dan pagination
 - ✅ Halaman "Total Stok Rendah" memiliki kolom status (Belum Order / Sudah Order)
 - ✅ Melihat tabel status per gudang + detail stok per gudang
+- ✅ **Ekspor semua gudang** ke Excel (.xlsx) — tombol di pojok kanan atas tabel "Status Per Gudang"
+- ✅ **Ekspor per gudang** ke Excel (.xlsx) — tombol di samping search bar halaman detail gudang
 - ❌ Tidak bisa membuat pesanan / pengadaan
 - ❌ Tidak bisa edit stok harian
 
@@ -210,6 +216,7 @@ Seeder membuat 13 akun demo:
 - ✅ Mengelola pesanan: Klik baris untuk membuka **Modal Detail**, update ETA, Tandai Diterima, atau Batalkan
 - ✅ Baris pesanan berwarna merah jika status masih **Sedang Dipesan** namun sudah melewati tanggal ETA (Jatuh Tempo)
 - ✅ Menerima notifikasi email stok rendah
+- ✅ **Ekspor per gudang** ke Excel (.xlsx) — tombol di samping search bar halaman detail gudang
 - ❌ Tidak bisa edit stok harian
 
 ---
@@ -319,7 +326,9 @@ sistem-managemen-stok-produk/
 │   ├── Console/Commands/
 │   │   └── CheckLowStock.php          # Command cek stok rendah + auto-resolve ETA expired
 │   ├── Http/
-│   │   ├── Controllers/Auth/          # Authentication controllers (Breeze)
+│   │   ├── Controllers/
+│   │   │   ├── Auth/                  # Authentication controllers (Breeze)
+│   │   │   └── ExportController.php   # Export stok gudang ke Excel (.xlsx)
 │   │   └── Middleware/
 │   │       └── CheckRole.php          # Role-based access middleware
 │   ├── Livewire/
@@ -351,10 +360,10 @@ sistem-managemen-stok-produk/
 ├── database/
 │   ├── migrations/                    # 6 tabel utama + default Laravel
 │   └── seeders/
-│       └── DatabaseSeeder.php         # 10 gudang
+│       └── DatabaseSeeder.php         # 10 gudang, 10 produk, 13 user, 100 stok
 ├── resources/views/
 │   ├── dashboard.blade.php            # Dashboard monitoring (Admin UID & Rent)
-│   ├── dashboard-manager.blade.php    # Dashboard monitoring (Manager — stat cards interaktif)
+│   ├── dashboard-manager.blade.php    # Dashboard monitoring (Manager — stat cards + tombol ekspor semua gudang)
 │   ├── emails/
 │   │   └── low-stock-alert.blade.php  # Template email notifikasi stok rendah
 │   ├── layouts/
@@ -370,11 +379,11 @@ sistem-managemen-stok-produk/
 │   │   ├── manage-warehouses.blade.php     # View kelola gudang
 │   │   ├── procurement-form.blade.php      # View form pengadaan
 │   │   ├── status-detail.blade.php          # View detail item per status
-│   │   └── warehouse-stock-detail.blade.php # View detail stok gudang
+│   │   └── warehouse-stock-detail.blade.php # View detail stok gudang (+ tombol ekspor per gudang)
 │   └── vendor/pagination/
 │       └── livewire-light.blade.php        # Custom pagination (light theme)
 ├── routes/
-│   ├── web.php                        # Routing utama + Livewire
+│   ├── web.php                        # Routing utama + Livewire + export routes
 │   ├── console.php                    # Scheduler (stock:check-low)
 │   └── auth.php                       # Auth routes (Breeze)
 └── bootstrap/
@@ -450,6 +459,19 @@ php artisan migrate:fresh --seed
 php -l app/Livewire/DailyStockInput.php
 php -l app/Livewire/ManageOrders.php
 php -l app/Console/Commands/CheckLowStock.php
+php -l app/Http/Controllers/ExportController.php
+```
+
+### Verifikasi Route Ekspor
+
+```bash
+php artisan route:list --name=export
+```
+
+Output yang diharapkan:
+```
+GET|HEAD  export/all-warehouses  export.all     › ExportController@exportAll
+GET|HEAD  export/warehouse/{id}  export.warehouse › ExportController@exportWarehouse
 ```
 
 ---

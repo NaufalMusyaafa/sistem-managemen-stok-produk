@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\DailyStockInput;
 use App\Livewire\ManageProducts;
@@ -75,6 +76,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/status/{type}', StatusDetail::class)
         ->middleware('role:manager,admin_uid,rent')
         ->name('status.detail');
+
+    // ──────────────────────────────────────────────
+    // Export Excel
+    // ──────────────────────────────────────────────
+    Route::get('/export/all-warehouses', [ExportController::class, 'exportAll'])
+        ->middleware('role:manager,admin_uid')
+        ->name('export.all');
+
+    Route::get('/export/warehouse/{id}', [ExportController::class, 'exportWarehouse'])
+        ->middleware('role:manager,admin_uid,rent')
+        ->name('export.warehouse');
 
     // ──────────────────────────────────────────────
     // Admin UID — CMS Management Pages
