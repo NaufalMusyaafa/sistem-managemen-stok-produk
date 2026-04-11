@@ -54,7 +54,11 @@ class StatusDetail extends Component
         $filterWarehouse = $this->filterWarehouse;
 
         $query = WarehouseProduct::withoutGlobalScopes()
-            ->with(['product', 'warehouse']);
+            ->with([
+                'product',
+                'warehouse',
+                'procurements' => fn ($q) => $q->where('status', 'ordered'),
+            ]);
 
         // Filter by status type
         if ($type === 'total_low') {
@@ -84,14 +88,17 @@ class StatusDetail extends Component
         $items = $query->orderBy('updated_at', 'desc')->paginate(15);
         $warehouses = Warehouse::orderBy('name')->get();
 
-        $showOrderBtn = $this->isRent && in_array($this->type, ['low_stock', 'total_low']);
+        $showOrderBtn      = $this->isRent && in_array($this->type, ['low_stock', 'total_low']);
+        $showOrderedQty    = in_array($type, ['on_order', 'total_low']);
 
         return view('livewire.status-detail', [
-            'items'         => $items,
-            'warehouses'    => $warehouses,
-            'title'         => $this->getTitle(),
-            'isTotalLow'    => $this->type === 'total_low',
-            'showOrderBtn'  => $showOrderBtn,
+            'items'          => $items,
+            'warehouses'     => $warehouses,
+            'title'          => $this->getTitle(),
+            'isTotalLow'     => $this->type === 'total_low',
+            'showOrderBtn'   => $showOrderBtn,
+            'showOrderedQty' => $showOrderedQty,
+            'type'           => $type,
         ])->layout('layouts.app');
     }
 }
