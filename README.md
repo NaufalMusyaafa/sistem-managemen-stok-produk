@@ -276,6 +276,7 @@ erDiagram
         bigint user_id FK
         varchar vendor_name
         varchar vendor_contact "nullable"
+        int ordered_quantity
         date order_date
         date eta_date "nullable"
         enum status "ordered | received | canceled"
