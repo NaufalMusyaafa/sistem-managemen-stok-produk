@@ -28,7 +28,7 @@ Sistem monitoring stok multi-gudang berbasis web untuk mengelola inventaris prod
 
 | Teknologi | Versi |
 |---|---|
-| PHP | 8.5+ |
+| PHP | 8.2+ |
 | Laravel | 12.x |
 | Livewire | 4.x |
 | Laravel Breeze | 2.x |
