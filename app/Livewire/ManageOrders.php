@@ -89,6 +89,24 @@ class ManageOrders extends Component
     }
 
     /**
+     * Resolve the effective ROP for a warehouse product,
+     * respecting rop_mode: 'manual' uses stored reorder_point,
+     * 'auto' calculates from avg_daily_usage, lead_time, safety_stock.
+     */
+    private function getRop(\App\Models\WarehouseProduct $wp): int
+    {
+        if ($wp->rop_mode === 'manual') {
+            return (int) $wp->reorder_point;
+        }
+
+        return app(InventoryService::class)->calculateROP(
+            (float) $wp->avg_daily_usage,
+            (int) $wp->lead_time,
+            (int) $wp->safety_stock
+        );
+    }
+
+    /**
      * Initiate the "mark received" flow.
      * If stock is already above ROP, show confirmation dialog first.
      * If stock is still below ROP, mark received immediately and add stock.
@@ -107,13 +125,8 @@ class ManageOrders extends Component
             return;
         }
 
-        $wp = $procurement->warehouseProduct;
-        $inventoryService = app(InventoryService::class);
-        $rop = $inventoryService->calculateROP(
-            (float) $wp->avg_daily_usage,
-            (int) $wp->lead_time,
-            (int) $wp->safety_stock
-        );
+        $wp  = $procurement->warehouseProduct;
+        $rop = $this->getRop($wp);
 
         if ($wp->current_stock > $rop) {
             // Stock already above ROP — ask user whether to add stock anyway
@@ -149,10 +162,10 @@ class ManageOrders extends Component
         if ($wp) {
             if ($addStock && $procurement->ordered_quantity > 0) {
                 $previousStock = $wp->current_stock;
-                $newStock = $previousStock + $procurement->ordered_quantity;
+                $newStock      = $previousStock + $procurement->ordered_quantity;
 
-                $wp->current_stock = $newStock;
-                $wp->save();
+                // Fix 2: use update() instead of save() to avoid full-model side effects
+                $wp->update(['current_stock' => $newStock]);
 
                 // Record stock history
                 StockHistory::create([
@@ -162,22 +175,20 @@ class ManageOrders extends Component
                     'current_stock'        => $newStock,
                     'difference'           => $procurement->ordered_quantity,
                 ]);
+
+                // Refresh local attribute after update
+                $wp->current_stock = $newStock;
             }
 
-            // Re-evaluate status based on current (possibly updated) stock
-            $inventoryService = app(InventoryService::class);
-            $rop = $inventoryService->calculateROP(
-                (float) $wp->avg_daily_usage,
-                (int) $wp->lead_time,
-                (int) $wp->safety_stock
-            );
+            // Fix 1: Re-evaluate status using getRop() which respects rop_mode
+            $rop = $this->getRop($wp);
 
             $otherActive = Procurement::where('warehouse_product_id', $wp->id)
                 ->where('status', 'ordered')
                 ->where('id', '!=', $id)
                 ->exists();
 
-            $wp->update(['status' => $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive)]);
+            $wp->update(['status' => app(InventoryService::class)->checkStatus($wp->current_stock, $rop, $otherActive)]);
         }
 
         // Refresh detail panel if open
@@ -217,19 +228,15 @@ class ManageOrders extends Component
         // Re-evaluate warehouse product status
         $wp = $procurement->warehouseProduct;
         if ($wp) {
-            $inventoryService = app(InventoryService::class);
-            $rop = $inventoryService->calculateROP(
-                (float) $wp->avg_daily_usage,
-                (int) $wp->lead_time,
-                (int) $wp->safety_stock
-            );
+            // Fix 1: use getRop() to respect rop_mode
+            $rop = $this->getRop($wp);
 
             $otherActive = Procurement::where('warehouse_product_id', $wp->id)
                 ->where('status', 'ordered')
                 ->where('id', '!=', $id)
                 ->exists();
 
-            $newStatus = $inventoryService->checkStatus($wp->current_stock, $rop, $otherActive);
+            $newStatus = app(InventoryService::class)->checkStatus($wp->current_stock, $rop, $otherActive);
             $wp->update(['status' => $newStatus]);
         }
 
